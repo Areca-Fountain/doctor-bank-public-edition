@@ -1,21 +1,22 @@
 'use client';
-import { useState, useEffect } from 'react';
+
+import { useTheme } from 'next-themes';
+import { useEffect, useState } from 'react';
 
 export default function ThemeToggle() {
-  const [isDark, setIsDark] = useState(false);
+  const { resolvedTheme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    if (isDark) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [isDark]);
+  useEffect(() => setMounted(true), []);
+
+  if (!mounted) return null;
+
+  const isDark = resolvedTheme === 'dark';
 
   return (
     <div className="fixed top-8 right-8 z-50 flex flex-col gap-3">
       <button
-        onClick={() => setIsDark(!isDark)}
+        onClick={() => setTheme(isDark ? 'light' : 'dark')}
         className={`
           relative w-[60px] h-[32px] rounded-full outline-none flex items-center shrink-0
           transition-colors duration-300 ease-in-out px-1 shadow-sm border cursor-pointer
