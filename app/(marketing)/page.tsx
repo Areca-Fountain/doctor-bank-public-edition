@@ -22,7 +22,7 @@ export default function LandingPage() {
   const darkColors = ["#000dff", "#0400ff", "#0400ff"];
   
   // ☀️ Light Mode: Your Red Range
-  const lightColors = ["#4c67ff", "#ffffff", "#c5c8ff"];
+  const lightColors = ["#4ca5ff", "#00bbff", "#7aceff"];
 
   return (
     <main className="min-h-screen relative flex flex-col items-center pt-40 pb-20 overflow-x-hidden" id="home">

@@ -6,9 +6,9 @@ export default function Hero() {
       <h1 className="text-6xl md:text-[5.5rem] font-black tracking-tight text-brand-primary dark:text-white leading-[1.1]">
         World's No.01
         <br />
-        <span className="text-[#8BA3B8]">Banking AI</span>
+        <span className="text-[#6a7e94]">Banking AI</span>
       </h1>
-      
+
       <h2 className="text-2xl md:text-[1.75rem] font-bold mt-8 text-brand-primary dark:text-white flex items-center justify-center gap-3">
         For Your <span className="bg-brand-primary text-white px-4 py-1.5 rounded-xl tracking-wide shadow-md">Banking</span> Needs
       </h2>
