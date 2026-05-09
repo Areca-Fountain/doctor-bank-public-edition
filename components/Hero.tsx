@@ -1,22 +1,60 @@
-// components/Hero.tsx
-import Link from "next/link";
+"use client";
+
+// 1. Make sure the import path is correct based on where you saved RotatingText.tsx
+import RotatingText from './RotatingText'; 
+
 export default function Hero() {
   return (
-    <section className="flex flex-col items-center text-center px-4 w-full max-w-5xl mt-10">
-      <h1 className="text-6xl md:text-[5.5rem] font-black tracking-tight text-brand-primary dark:text-white leading-[1.1]">
+    <div className="flex flex-col items-center justify-center text-center w-full z-10 relative">
+      
+      {/* Your existing main titles */}
+      <h1 className="text-6xl md:text-8xl font-black tracking-tight text-[#011F4B] dark:text-white mb-2">
         World's No.01
-        <br />
-        <span className="text-[#6a7e94]">Banking AI</span>
       </h1>
-
-      <h2 className="text-2xl md:text-[1.75rem] font-bold mt-8 text-brand-primary dark:text-white flex items-center justify-center gap-3">
-        For Your <span className="bg-brand-primary text-white px-4 py-1.5 rounded-xl tracking-wide shadow-md">Banking</span> Needs
+      <h2 className="text-6xl md:text-8xl font-black tracking-tight text-gray-400/50 mb-12">
+        Banking AI
       </h2>
 
-      <button className="mt-14 flex items-center gap-4 bg-gray-50/80 dark:bg-gray-800/80 backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-200 dark:border-gray-700 rounded-full pl-6 pr-2 py-2 text-lg font-bold text-brand-primary dark:text-white hover:shadow-lg transition-all">
-        Chat with Doctor Bank
-        <span className="bg-brand-primary text-white px-6 py-2 rounded-full text-sm font-semibold">Start</span>
-      </button>
-    </section>
+      {/* --- ROTATING TEXT SECTION --- */}
+      <div className="flex items-center gap-3 text-2xl md:text-3xl font-bold mb-16 text-[#011F4B] dark:text-white">
+        <span>For Your</span>
+        
+        {/* We replaced the static box with RotatingText */}
+        <RotatingText
+          texts={[
+            'Personal Banking', 
+            'Business Loans', 
+            'Banking Applications', 
+            'Savings Guide'
+          ]}
+          // Updated styling to match your dark blue box and white text
+          mainClassName="px-4 sm:px-5 md:px-6 bg-[#011F4B] text-white overflow-hidden py-2 sm:py-3 md:py-3 justify-center rounded-xl shadow-lg"
+          staggerFrom="last"
+          initial={{ y: "100%" }}
+          animate={{ y: 0 }}
+          exit={{ y: "-120%" }}
+          staggerDuration={0.025}
+          splitLevelClassName="overflow-hidden pb-0.5 sm:pb-1 md:pb-1"
+          transition={{ type: "spring", damping: 30, stiffness: 400 }}
+          // Increased interval slightly so users have time to read longer phrases
+          rotationInterval={3000} 
+          splitBy="characters"
+          auto
+          loop
+        />
+        
+        <span>Needs</span>
+      </div>
+      {/* ----------------------------- */}
+
+      {/* Your existing CTA Button */}
+      <div className="flex items-center bg-white dark:bg-[#011F4B] rounded-full p-2 pr-2 pl-6 shadow-xl border border-gray-100 dark:border-white/10">
+        <span className="font-semibold text-sm mr-4 text-[#011F4B] dark:text-white">Chat with Doctor Bank</span>
+        <button className="bg-[#011F4B] dark:bg-brand-primary text-white px-6 py-2 rounded-full text-sm font-bold hover:opacity-90 transition-opacity">
+          Start
+        </button>
+      </div>
+
+    </div>
   );
 }
