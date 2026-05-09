@@ -1,6 +1,6 @@
 "use client";
 
-// 1. Make sure the import path is correct based on where you saved RotatingText.tsx
+import Link from "next/link";
 import RotatingText from './RotatingText'; 
 
 export default function Hero() {
@@ -8,7 +8,7 @@ export default function Hero() {
     <div className="flex flex-col items-center justify-center text-center w-full z-10 relative">
       
       {/* Your existing main titles */}
-      <h1 className="text-6xl md:text-8xl font-black tracking-tight text-[#011F4B] dark:text-white mb-2">
+      <h1 className="text-6xl md:text-8xl font-black tracking-tight text-brand-primary dark:text-white mb-2">
         World's No.01
       </h1>
       <h2 className="text-6xl md:text-8xl font-black tracking-tight text-gray-400/50 mb-12">
@@ -16,7 +16,7 @@ export default function Hero() {
       </h2>
 
       {/* --- ROTATING TEXT SECTION --- */}
-      <div className="flex items-center gap-3 text-2xl md:text-3xl font-bold mb-16 text-[#011F4B] dark:text-white">
+      <div className="flex items-center gap-3 text-2xl md:text-3xl font-bold mb-16 text-brand-primary dark:text-white">
         <span>For Your</span>
         
         {/* We replaced the static box with RotatingText */}
@@ -28,7 +28,7 @@ export default function Hero() {
             'Savings Guide'
           ]}
           // Updated styling to match your dark blue box and white text
-          mainClassName="px-4 sm:px-5 md:px-6 bg-[#011F4B] text-white overflow-hidden py-2 sm:py-3 md:py-3 justify-center rounded-xl shadow-lg"
+          mainClassName="px-4 sm:px-5 md:px-6 bg-brand-primary text-white overflow-hidden py-2 sm:py-3 md:py-3 justify-center rounded-xl shadow-lg"
           staggerFrom="last"
           initial={{ y: "100%" }}
           animate={{ y: 0 }}
@@ -36,7 +36,6 @@ export default function Hero() {
           staggerDuration={0.025}
           splitLevelClassName="overflow-hidden pb-0.5 sm:pb-1 md:pb-1"
           transition={{ type: "spring", damping: 30, stiffness: 400 }}
-          // Increased interval slightly so users have time to read longer phrases
           rotationInterval={3000} 
           splitBy="characters"
           auto
@@ -47,13 +46,17 @@ export default function Hero() {
       </div>
       {/* ----------------------------- */}
 
-      {/* Your existing CTA Button */}
-      <div className="flex items-center bg-white dark:bg-[#011F4B] rounded-full p-2 pr-2 pl-6 shadow-xl border border-gray-100 dark:border-white/10">
-        <span className="font-semibold text-sm mr-4 text-[#011F4B] dark:text-white">Chat with Doctor Bank</span>
-        <button className="bg-[#011F4B] dark:bg-brand-primary text-white px-6 py-2 rounded-full text-sm font-bold hover:opacity-90 transition-opacity">
+      {/* Your connected CTA Link with Dark Mode Support */}
+      <Link 
+        href="/chat" 
+        className="mt-14 flex items-center gap-4 bg-white dark:bg-[#0f172a] shadow-xl border border-gray-100 dark:border-white/10 rounded-full pl-6 pr-2 py-2 text-lg font-bold text-brand-primary dark:text-white hover:scale-105 transition-transform duration-200"
+      >
+        Chat with Doctor Bank
+        
+        <span className="bg-brand-primary dark:bg-white text-white dark:text-brand-primary px-6 py-2 rounded-full text-sm font-semibold transition-colors">
           Start
-        </button>
-      </div>
+        </span>
+      </Link>
 
     </div>
   );
