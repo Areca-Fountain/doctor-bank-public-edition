@@ -1,7 +1,7 @@
 import { withSentryConfig } from "@sentry/nextjs";
 import type { NextConfig } from "next";
 
-const nextConfig = {
+const nextConfig: NextConfig = {
   serverExternalPackages: ["require-in-the-middle", "import-in-the-middle"],
   // ... any other config you already have here
 };
