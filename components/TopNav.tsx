@@ -56,20 +56,28 @@ export default function TopNav({ view, setView }: TopNavProps) {
                 Log Out
               </button>
 
-              {/* White User Profile Pill */}
-              <div className="bg-white rounded-full flex items-center gap-3 pr-6 py-1.5 shadow-md">
-                <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 border border-gray-200 ml-1.5">
-                  <img 
-                    // Uses the Google avatar, or falls back to a brown UI avatar matching your mockup
-                    src={session.user.image || `https://ui-avatars.com/api/?name=${session.user.name || 'User'}&background=5C3A21&color=fff`} 
-                    alt="User Avatar" 
-                    className="w-full h-full object-cover"
-                  />
+              {/* White User Profile Pill - NOW A CLICKABLE LINK TO DASHBOARD */}
+              <Link 
+                href="/dashboard"
+                className="bg-white rounded-full flex items-center gap-3 pr-6 py-1.5 shadow-md hover:bg-gray-100 hover:scale-[1.02] transition-all cursor-pointer"
+                title="Go to Dashboard"
+              >
+                <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 border border-gray-200 ml-1.5 bg-[#0188CB] flex items-center justify-center text-white font-bold text-xl">
+                  {/* If they have a Google image, use it. Otherwise show their initial */}
+                  {session.user.image ? (
+                     <img 
+                      src={session.user.image} 
+                      alt="User Avatar" 
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    session.user.name?.charAt(0).toUpperCase() || 'U'
+                  )}
                 </div>
                 <span className="text-[#011F4B] font-bold text-lg">
                   {session.user.name?.split(' ')[0] || 'Username'}
                 </span>
-              </div>
+              </Link>
             </>
           ) : (
             /* Logged Out State */
