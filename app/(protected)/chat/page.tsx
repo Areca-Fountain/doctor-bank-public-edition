@@ -14,6 +14,9 @@ function ChatMainLogic() {
   const searchParams = useSearchParams();
   const chatId = searchParams.get("id");
 
+  // NEW: State to track if we are currently loading the chat history
+  const [isFetchingHistory, setIsFetchingHistory] = useState(!!chatId);
+
   const [pdfBase64, setPdfBase64] = useState<string | null>(null);
   const [uploadedFiles, setUploadedFiles] = useState<{ name: string; date: string }[]>([]);
   
@@ -52,9 +55,15 @@ function ChatMainLogic() {
           }
         } catch (error) {
           console.error("Failed to load past chat:", error);
+        } finally {
+          // NEW: Turn off the loading screen whether it succeeds or fails
+          setIsFetchingHistory(false);
         }
       };
       loadSavedChat();
+    } else {
+      // If there is no chatId in the URL, we aren't loading history!
+      setIsFetchingHistory(false);
     }
   }, [chatId]);
 
@@ -129,6 +138,18 @@ function ChatMainLogic() {
       <div className="min-h-screen bg-white flex items-center justify-center p-8 pt-32">
         <div className="w-full max-w-[1300px] h-[750px] flex gap-8 border border-gray-200 rounded-[50px] p-8 pb-12 relative overflow-hidden">
           
+          {/* --- NEW: FETCHING HISTORY LOADING OVERLAY --- */}
+          {isFetchingHistory && (
+            <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/60 backdrop-blur-sm rounded-[50px]">
+              {/* Spinning Circle */}
+              <div className="w-16 h-16 border-4 border-[#D9D9D9] border-t-[#011F4B] rounded-full animate-spin"></div>
+              {/* Loading Text */}
+              <h2 className="mt-6 text-2xl font-bold text-[#011F4B]">Retrieving Documents</h2>
+              <p className="text-gray-600 mt-2 font-medium">Doctor Bank is securely loading your chat history...</p>
+            </div>
+          )}
+          {/* --------------------------------------------- */}
+
           {/* LEFT SIDEBAR */}
           <div className="w-80 flex flex-col gap-6 relative z-10 pt-4">
             <div className="bg-[#D9D9D9] rounded-[30px] p-8 text-center shadow-sm">
