@@ -1,91 +1,66 @@
 "use client";
 
-import { signOut, useSession, signIn } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
-import Image from "next/image"; // Added Image import
+import Image from "next/image";
 
-interface TopNavProps {
-  view?: "chat" | "dashboard";
-  setView?: (view: "chat" | "dashboard") => void;
-}
-
-export default function TopNav({ view, setView }: TopNavProps) {
+export default function TopNav() {
   const { data: session } = useSession();
 
   return (
-    <div className="fixed top-8 w-full z-40 flex justify-center px-4">
-      <nav className="bg-brand-primary rounded-full px-2 py-2 flex items-center justify-between w-full max-w-[800px] shadow-2xl">
+    // We use pointer-events-none on the container so users can click the chat behind the empty space, 
+    // and pointer-events-auto on the actual buttons.
+    <div className="fixed top-8 w-full z-50 px-8 flex justify-between items-center pointer-events-none">
+      
+      {/* LEFT SIDE: Home Pill & Theme Toggle */}
+      <div className="flex items-center gap-4 pointer-events-auto">
         
-        {/* Left Side: Logo & Main Links */}
-        <div className="flex items-center gap-10 pl-2">
-          {/* --- UPDATED LOGO SECTION --- */}
-          <Link 
-            href="/" 
-            className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center shrink-0 cursor-pointer overflow-hidden group"
-          >
-            <Image 
-              src="/logo.svg" 
-              alt="Doctor Bank Logo" 
-              width={32} // Display size in pixels
-              height={32}
-              priority // Tells Next.js to load this immediately
-              className="group-hover:scale-110 transition-transform duration-200"
-            />
-          </Link>
+        {/* Home Button Pill */}
+        <Link 
+          href="/" 
+          className="bg-[#011F4B] text-white rounded-full flex items-center gap-4 pr-6 pl-1.5 py-1.5 shadow-lg hover:bg-[#011F4B]/90 transition-colors"
+        >
+          <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center shrink-0">
+            {/* Make sure you have a logo.svg in your public folder! */}
+            <Image src="/logo.svg" alt="Doctor Bank Logo" width={24} height={24} className="opacity-90" />
+          </div>
+          <span className="font-semibold text-lg tracking-wide">Home</span>
+        </Link>
 
-          {/* Marketing Links */}
-          {!session ? (
-            <div className="hidden md:flex items-center gap-8 text-white/90 text-sm font-medium">
-              <Link href="/#home" className="hover:text-white transition-colors">Home</Link>
-              <Link href="/#pricing" className="hover:text-white transition-colors">Pricing</Link>
-              <Link href="/#about" className="hover:text-white transition-colors">About Us</Link>
-            </div>
-          ) : (
-            /* App Navigation */
-            <div className="hidden md:flex items-center gap-8 text-white/90 text-sm font-medium">
-              {setView && (
-                <>
-                  <button 
-                    onClick={() => setView("chat")} 
-                    className={`transition-all ${view === "chat" ? "text-white underline underline-offset-8 decoration-2 decoration-white/50" : "text-white/60 hover:text-white"}`}
-                  >
-                    Chat
-                  </button>
-                  <button 
-                    onClick={() => setView("dashboard")} 
-                    className={`transition-all ${view === "dashboard" ? "text-white underline underline-offset-8 decoration-2 decoration-white/50" : "text-white/60 hover:text-white"}`}
-                  >
-                    Dashboard
-                  </button>
-                </>
-              )}
-            </div>
-          )}
+        {/* Toggle Switch */}
+        <div className="bg-white rounded-full w-16 h-8 p-1 flex items-center shadow-md cursor-pointer border border-gray-100 hover:bg-gray-50 transition-colors">
+          <div className="bg-[#011F4B] w-6 h-6 rounded-full shadow-sm"></div>
         </div>
+      </div>
 
-        {/* Right Side: Auth */}
-        <div className="flex items-center gap-4 pr-2 text-sm font-semibold">
-          {session?.user ? (
-            <button 
-              onClick={() => signOut({ callbackUrl: "/" })}
-              className="w-12 h-12 rounded-full border border-white/20 overflow-hidden hover:opacity-80 transition-opacity"
-            >
+      {/* RIGHT SIDE: Settings & Dashboard */}
+      <div className="pointer-events-auto">
+        {/* Main Dark Blue Pill Container */}
+        <div className="bg-[#011F4B] p-1.5 pl-6 rounded-full flex items-center gap-6 shadow-lg">
+          
+          <Link href="/settings" className="text-white font-semibold text-lg hover:text-white/80 transition-colors">
+            Go to Settings
+          </Link>
+          
+          {/* Inner White Dashboard Pill */}
+          <Link 
+            href="/dashboard" 
+            className="bg-white rounded-full flex items-center gap-3 pr-6 py-1.5 cursor-pointer hover:bg-gray-100 transition-colors"
+          >
+            <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 border border-gray-200 ml-1.5">
               <img 
-                src={session.user.image || `https://ui-avatars.com/api/?name=${session.user.name}&background=fff&color=011F4B`} 
-                alt="User" 
+                // Uses your session image, or a fallback avatar matching the brown color in your UI mockup
+                src={session?.user?.image || `https://ui-avatars.com/api/?name=${session?.user?.name || 'U'}&background=5C3A21&color=fff`} 
+                alt="User Avatar" 
                 className="w-full h-full object-cover"
               />
-            </button>
-          ) : (
-            <>
-              <button onClick={() => signIn("google")} className="text-white hover:text-white/80 transition-colors px-4">Login</button>
-              <button onClick={() => signIn("google")} className="bg-white text-brand-primary px-6 py-2.5 rounded-full hover:bg-gray-100 transition-colors shadow-sm">
-                Sign up
-              </button>
-            </>
-          )}
+            </div>
+            <span className="text-[#011F4B] font-bold text-lg">Dashboard</span>
+          </Link>
+          
         </div>
-      </nav>
+      </div>
+
     </div>
   );
 }
