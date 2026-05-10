@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { Prisma, PrismaClient } from "@prisma/client";
+import { Prisma } from "@prisma/client";
+import prisma from "@/lib/db";
 import {
   PDFCheckBox,
   PDFDocument,
@@ -11,7 +12,9 @@ import { NextResponse } from "next/server";
 
 import { authOptions } from "../auth/[...nextauth]/route";
 
-const prisma = new PrismaClient();
+// --- THE PRISMA FIX ---
+
+// ----------------------
 
 type ChatHistoryMessage = {
   role: string;
