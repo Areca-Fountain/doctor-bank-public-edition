@@ -9,6 +9,12 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   secret: process.env.NEXTAUTH_SECRET,
+  
+  // --- ADDED THIS BLOCK ---
+  // This tells NextAuth to use your custom page instead of the default UI
+  pages: {
+    signIn: '/login', 
+  },
 };
 
 const handler = NextAuth(authOptions);
