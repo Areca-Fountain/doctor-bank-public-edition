@@ -14,29 +14,29 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      // THE FIX: Allows linking Google accounts to existing email addresses in your DB
+      allowDangerousEmailAccountLinking: true, 
     }),
   ],
+  
   secret: process.env.NEXTAUTH_SECRET,
-  debug: true, // <--- ADD THIS LINE HERE
+  debug: true, 
   
   pages: {
     signIn: '/login', 
   },
   
-  // --- THE FIX: Force NextAuth to use JWT tokens for the session ---
   session: {
     strategy: "jwt",
   },
   
   callbacks: {
-    // 1. When you log in, attach the database User ID to the JWT token
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
       }
       return token;
     },
-    // 2. Pass that ID from the token into the active session so your app can use it
     async session({ session, token }) {
       if (session?.user && token?.id) {
         // @ts-ignore
@@ -48,5 +48,4 @@ export const authOptions: NextAuthOptions = {
 };
 
 const handler = NextAuth(authOptions);
-
 export { handler as GET, handler as POST };
