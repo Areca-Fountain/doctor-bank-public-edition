@@ -12,10 +12,6 @@ import { NextResponse } from "next/server";
 
 import { authOptions } from "../auth/[...nextauth]/route";
 
-// --- THE PRISMA FIX ---
-
-// ----------------------
-
 type ChatHistoryMessage = {
   role: string;
   text: string;
@@ -31,10 +27,7 @@ export async function POST(req: Request) {
     const geminiApiKey = process.env.GEMINI_API_KEY;
 
     if (!geminiApiKey) {
-      return NextResponse.json(
-        { text: "Server configuration error." },
-        { status: 500 },
-      );
+      return NextResponse.json({ text: "Server configuration error." }, { status: 500 });
     }
 
     const body = (await req.json()) as {
@@ -43,8 +36,7 @@ export async function POST(req: Request) {
       pdfData?: string;
     };
 
-    const message =
-      typeof body.message === "string" ? body.message.trim() : "";
+    const message = typeof body.message === "string" ? body.message.trim() : "";
     const pdfData = typeof body.pdfData === "string" ? body.pdfData : "";
     const history = Array.isArray(body.history) ? body.history : [];
     const todayDate = new Date().toLocaleDateString("en-GB");
@@ -53,17 +45,11 @@ export async function POST(req: Request) {
     const userEmail = session?.user?.email;
 
     if (!message) {
-      return NextResponse.json(
-        { text: "Please enter a message to continue." },
-        { status: 400 },
-      );
+      return NextResponse.json({ text: "Please enter a message to continue." }, { status: 400 });
     }
 
     if (!pdfData) {
-      return NextResponse.json(
-        { text: "Please upload a PDF form first to start the interview!" },
-        { status: 400 },
-      );
+      return NextResponse.json({ text: "Please upload a PDF form first to start the interview!" }, { status: 400 });
     }
 
     const pdfBuffer = Buffer.from(pdfData, "base64");
@@ -101,12 +87,7 @@ export async function POST(req: Request) {
     });
 
     const formattedHistory = history
-      .filter(
-        (msg): msg is ChatHistoryMessage =>
-          !!msg &&
-          typeof msg.role === "string" &&
-          typeof msg.text === "string",
-      )
+      .filter((msg): msg is ChatHistoryMessage => !!msg && typeof msg.role === "string" && typeof msg.text === "string")
       .map((msg) => ({
         role: msg.role === "user" ? "user" : "model",
         parts: [{ text: msg.text }],
@@ -135,36 +116,39 @@ export async function POST(req: Request) {
       const jsonEndIndex = responseText.lastIndexOf("}");
 
       if (jsonStartIndex !== -1 && jsonEndIndex !== -1) {
-        const jsonString = responseText.substring(
-          jsonStartIndex,
-          jsonEndIndex + 1,
-        );
+        const jsonString = responseText.substring(jsonStartIndex, jsonEndIndex + 1);
 
         try {
           const extractedData = JSON.parse(jsonString) as ExtractedData;
-          console.log("AI extracted data:", extractedData);
 
           if (isFinished && userEmail) {
             try {
-              let user = await prisma.user.findUnique({
-                where: { email: userEmail },
-              });
+              let user = await prisma.user.findUnique({ where: { email: userEmail } });
 
               if (!user) {
-                console.log("User not found. Creating a new user record...");
-                user = await prisma.user.create({
-                  data: { email: userEmail },
-                });
+                user = await prisma.user.create({ data: { email: userEmail } });
               }
+
+              const dynamicChatTitle = typeof extractedData["Business Name"] === "string"
+                ? extractedData["Business Name"]
+                : "Bank Application";
+
+              // Combine frontend history with the AI's final response for DB saving
+              const fullChatHistory = [
+                ...history,
+                { role: "model", text: responseText }
+              ];
 
               await prisma.application.create({
                 data: {
                   userId: user.id,
-                  pdfName: "Bank Application",
+                  pdfName: dynamicChatTitle,
                   data: extractedData,
+                  chatHistory: fullChatHistory, 
+                  pdfData: pdfData, 
                 },
               });
-              console.log("Successfully saved to PostgreSQL.");
+
             } catch (dbError) {
               console.error("Failed to save to database:", dbError);
             }
@@ -180,32 +164,18 @@ export async function POST(req: Request) {
               const cleanFieldName = normalizeValue(fieldName);
               const cleanDataKey = normalizeValue(key);
               const cleanDataValue = normalizeValue(String(extractedData[key]));
-
-              return (
-                cleanFieldName === cleanDataKey ||
-                cleanFieldName === cleanDataValue
-              );
+              return cleanFieldName === cleanDataKey || cleanFieldName === cleanDataValue;
             });
 
-            if (!matchingKey) {
-              continue;
-            }
+            if (!matchingKey) continue;
 
             try {
               if (field instanceof PDFTextField) {
                 field.setText(String(extractedData[matchingKey]));
               } else if (field instanceof PDFCheckBox) {
-                const value = normalizeValue(
-                  String(extractedData[matchingKey]),
-                );
+                const value = normalizeValue(String(extractedData[matchingKey]));
                 const cleanFieldName = normalizeValue(fieldName);
-
-                if (
-                  value === "true" ||
-                  value === "yes" ||
-                  value === "x" ||
-                  value === cleanFieldName
-                ) {
+                if (value === "true" || value === "yes" || value === "x" || value === cleanFieldName) {
                   field.check();
                 }
               } else if (field instanceof PDFRadioGroup) {
@@ -240,9 +210,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ text: responseText });
   } catch (error: unknown) {
     console.error("API error:", error);
-    return NextResponse.json(
-      { text: "Error processing request." },
-      { status: 500 },
-    );
+    return NextResponse.json({ text: "Error processing request." }, { status: 500 });
   }
 }

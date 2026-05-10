@@ -3,19 +3,29 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "../auth/[...nextauth]/route";
 import prisma from "@/lib/db";
 
-// GET: Fetch all saved chats for the logged-in user
-export async function GET() {
+// GET: Fetch chats (Either ALL for dashboard, or a SINGLE one for the chat screen)
+export async function GET(req: Request) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Find the user's ID
     const user = await prisma.user.findUnique({ where: { email: session.user.email } });
     if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
-    // Fetch their applications, ordered by newest first
+    const url = new URL(req.url);
+    const id = url.searchParams.get("id");
+
+    // IF CONTINUING A CHAT: Return the specific chat history & PDF
+    if (id) {
+      const application = await prisma.application.findUnique({
+        where: { id: id, userId: user.id },
+      });
+      return NextResponse.json(application);
+    }
+
+    // IF ON DASHBOARD: Fetch list of applications
     const applications = await prisma.application.findMany({
       where: { userId: user.id },
       orderBy: { createdAt: "desc" },
@@ -48,7 +58,6 @@ export async function DELETE(req: Request) {
     const id = searchParams.get("id");
     const all = searchParams.get("all");
 
-    // If 'all=true' is passed, delete everything for this user
     if (all === "true") {
       await prisma.application.deleteMany({
         where: { userId: user.id }
@@ -56,10 +65,9 @@ export async function DELETE(req: Request) {
       return NextResponse.json({ message: "All chats deleted successfully" });
     }
 
-    // Otherwise, delete the specific ID
     if (id) {
       await prisma.application.delete({
-        where: { id: id, userId: user.id } // Ensures users can only delete their own chats
+        where: { id: id, userId: user.id } 
       });
       return NextResponse.json({ message: "Chat deleted successfully" });
     }
