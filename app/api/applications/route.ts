@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "../auth/[...nextauth]/route";
 import prisma from "@/lib/db";
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.email) {
@@ -13,6 +13,18 @@ export async function GET() {
     const user = await prisma.user.findUnique({ where: { email: session.user.email } });
     if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get("id");
+
+    // NEW: If an ID is provided, fetch ONLY that specific application to continue
+    if (id) {
+      const application = await prisma.application.findUnique({
+        where: { id: id, userId: user.id },
+      });
+      return NextResponse.json(application);
+    }
+
+    // Default: Fetch all applications for the dashboard
     const applications = await prisma.application.findMany({
       where: { userId: user.id },
       orderBy: { createdAt: "desc" },

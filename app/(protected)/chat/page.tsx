@@ -9,13 +9,13 @@ type Message = {
   text: string;
 };
 
-// We wrap the main chat logic in a component to support Suspense for Next.js routing
 function ChatMainLogic() {
   const searchParams = useSearchParams();
-  const chatId = searchParams.get("id");
-
-  // NEW: State to track if we are currently loading the chat history
-  const [isFetchingHistory, setIsFetchingHistory] = useState(!!chatId);
+  const urlChatId = searchParams.get("id");
+  
+  // Track the ID in state so new chats can get an ID on the first message
+  const [chatId, setChatId] = useState<string | null>(urlChatId);
+  const [isFetchingHistory, setIsFetchingHistory] = useState(!!urlChatId);
 
   const [pdfBase64, setPdfBase64] = useState<string | null>(null);
   const [uploadedFiles, setUploadedFiles] = useState<{ name: string; date: string }[]>([]);
@@ -28,23 +28,18 @@ function ChatMainLogic() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Auto-scroll to bottom of chat
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // LOAD RESUMED CHAT IF APPLICABLE
   useEffect(() => {
-    if (chatId) {
+    if (urlChatId) {
       const loadSavedChat = async () => {
         try {
-          const res = await fetch(`/api/applications?id=${chatId}`);
+          const res = await fetch(`/api/applications?id=${urlChatId}`);
           if (res.ok) {
             const data = await res.json();
-            
-            if (data.chatHistory) {
-               setMessages(data.chatHistory); 
-            }
+            if (data.chatHistory) setMessages(data.chatHistory); 
             if (data.pdfData) {
                setPdfBase64(data.pdfData);
                setUploadedFiles([{ 
@@ -56,16 +51,14 @@ function ChatMainLogic() {
         } catch (error) {
           console.error("Failed to load past chat:", error);
         } finally {
-          // NEW: Turn off the loading screen whether it succeeds or fails
           setIsFetchingHistory(false);
         }
       };
       loadSavedChat();
     } else {
-      // If there is no chatId in the URL, we aren't loading history!
       setIsFetchingHistory(false);
     }
-  }, [chatId]);
+  }, [urlChatId]);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -84,7 +77,6 @@ function ChatMainLogic() {
 
   const handleSendMessage = async () => {
     if (!inputText.trim()) return;
-
     if (!pdfBase64) {
       alert("Please upload a PDF form first to start!");
       return;
@@ -101,6 +93,7 @@ function ChatMainLogic() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          applicationId: chatId, // Pass the current ID to the backend
           message: newUserMessage.text,
           pdfData: pdfBase64,
           history: currentHistory, 
@@ -108,6 +101,12 @@ function ChatMainLogic() {
       });
 
       const data = await res.json();
+
+      // If the server created a new chat record, save its ID
+      if (data.applicationId && !chatId) {
+        setChatId(data.applicationId);
+        window.history.replaceState(null, '', `/chat?id=${data.applicationId}`);
+      }
 
       if (data.text) {
         setMessages(prev => [...prev, { role: "model", text: data.text }]);
@@ -138,17 +137,13 @@ function ChatMainLogic() {
       <div className="min-h-screen bg-white flex items-center justify-center p-8 pt-32">
         <div className="w-full max-w-[1300px] h-[750px] flex gap-8 border border-gray-200 rounded-[50px] p-8 pb-12 relative overflow-hidden">
           
-          {/* --- NEW: FETCHING HISTORY LOADING OVERLAY --- */}
           {isFetchingHistory && (
             <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/60 backdrop-blur-sm rounded-[50px]">
-              {/* Spinning Circle */}
               <div className="w-16 h-16 border-4 border-[#D9D9D9] border-t-[#011F4B] rounded-full animate-spin"></div>
-              {/* Loading Text */}
               <h2 className="mt-6 text-2xl font-bold text-[#011F4B]">Retrieving Documents</h2>
               <p className="text-gray-600 mt-2 font-medium">Doctor Bank is securely loading your chat history...</p>
             </div>
           )}
-          {/* --------------------------------------------- */}
 
           {/* LEFT SIDEBAR */}
           <div className="w-80 flex flex-col gap-6 relative z-10 pt-4">
@@ -226,7 +221,6 @@ function ChatMainLogic() {
   );
 }
 
-// Wrapper to prevent Next.js build errors with useSearchParams
 export default function ChatPage() {
   return (
     <Suspense fallback={<div className="min-h-screen bg-white flex items-center justify-center">Loading...</div>}>
