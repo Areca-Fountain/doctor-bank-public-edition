@@ -42,7 +42,7 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
-  applications  Application[] // Link to our custom Application model
+  applications  Application[] 
 }
 
 model VerificationToken {
@@ -57,7 +57,9 @@ model Application {
   id          String   @id @default(cuid())
   userId      String
   pdfName     String
-  data        Json     // Stores the raw AI-extracted JSON
+  data        Json     
+  chatHistory Json?    // <-- Saves the chat messages
+  pdfData     String?  @db.Text // <-- Saves the PDF file 
   createdAt   DateTime @default(now())
   user        User     @relation(fields: [userId], references: [id])
 }
