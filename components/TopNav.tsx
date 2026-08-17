@@ -15,8 +15,8 @@ export default function TopNav({ view, setView }: TopNavProps) {
   return (
     <div className="fixed top-8 w-full z-50 flex justify-center px-4 pointer-events-none">
       
-      {/* Main Dark Blue Nav Bar */}
-      <nav className="bg-[#011F4B] rounded-[40px] px-2 py-2 flex items-center justify-between w-full max-w-[1100px] shadow-2xl pointer-events-auto">
+      {/* Main Deep Purple Nav Bar */}
+      <nav className="bg-[#4C1D95] rounded-[40px] px-2 py-2 flex items-center justify-between w-full max-w-[1100px] shadow-2xl pointer-events-auto">
         
         {/* Left Side: Logo & Links */}
         <div className="flex items-center gap-10 pl-2">
@@ -36,7 +36,7 @@ export default function TopNav({ view, setView }: TopNavProps) {
             />
           </Link>
 
-          {/* Navigation Links - Visible based on your new UI */}
+          {/* Navigation Links */}
           <div className="hidden md:flex items-center gap-8 text-white text-[17px] font-medium tracking-wide">
             <Link href="/" className="hover:text-white/80 transition-colors">Home</Link>
             <Link href="/#pricing" className="hover:text-white/80 transition-colors">Pricing</Link>
@@ -56,14 +56,13 @@ export default function TopNav({ view, setView }: TopNavProps) {
                 Log Out
               </button>
 
-              {/* White User Profile Pill - NOW A CLICKABLE LINK TO DASHBOARD */}
+              {/* White User Profile Pill */}
               <Link 
                 href="/dashboard"
                 className="bg-white rounded-full flex items-center gap-3 pr-6 py-1.5 shadow-md hover:bg-gray-100 hover:scale-[1.02] transition-all cursor-pointer"
                 title="Go to Dashboard"
               >
-                <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 border border-gray-200 ml-1.5 bg-[#0188CB] flex items-center justify-center text-white font-bold text-xl">
-                  {/* If they have a Google image, use it. Otherwise show their initial */}
+                <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 border border-gray-200 ml-1.5 bg-[#9333EA] flex items-center justify-center text-white font-bold text-xl">
                   {session.user.image ? (
                      <img 
                       src={session.user.image} 
@@ -74,18 +73,17 @@ export default function TopNav({ view, setView }: TopNavProps) {
                     session.user.name?.charAt(0).toUpperCase() || 'U'
                   )}
                 </div>
-                <span className="text-[#011F4B] font-bold text-lg">
+                <span className="text-[#4C1D95] font-bold text-lg">
                   {session.user.name?.split(' ')[0] || 'Username'}
                 </span>
               </Link>
             </>
           ) : (
-            /* Logged Out State */
             <>
               <button onClick={() => signIn("google")} className="text-white hover:text-white/80 transition-colors px-4 font-semibold text-lg">
                 Login
               </button>
-              <button onClick={() => signIn("google")} className="bg-white text-[#011F4B] font-bold text-lg px-8 py-2.5 rounded-full hover:bg-gray-100 transition-colors shadow-sm">
+              <button onClick={() => signIn("google")} className="bg-white text-[#4C1D95] font-bold text-lg px-8 py-2.5 rounded-full hover:bg-gray-100 transition-colors shadow-sm">
                 Sign up
               </button>
             </>

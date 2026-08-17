@@ -5,11 +5,11 @@
 
 :root {
   --background: #FFFFFF;
-  --foreground: #011F4B;
+  --foreground: #2E1065; /* Deep Purple text */
 }
 
 .dark {
-  --background: #020617;
+  --background: #0B0512; /* Very dark purple/black background */
   --foreground: #F8FAFC;
 }
 

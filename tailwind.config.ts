@@ -13,8 +13,8 @@ const config: Config = {
         background: "var(--background)",
         foreground: "var(--foreground)",
         brand: {
-          primary: "#011F4B",    // Deep Navy
-          secondary: "#005b96",  // Royal Blue
+          primary: "#7E22CE",    // Deep Navy
+          secondary: "#13002c",  // Royal Blue
           accent: "#8BA3B8",     // Soft Blue for 'Banking AI'
           glass: "rgba(255, 255, 255, 0.1)",
         },
