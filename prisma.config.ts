@@ -1,11 +1,12 @@
 import { config } from "dotenv";
-config({ path: ".env.local" });
 import { defineConfig } from "@prisma/config";
+
+// Load secrets from .env.local (this file is gitignored). Never hardcode the database URL here.
+config({ path: ".env.local" });
 
 export default defineConfig({
   schema: "prisma/schema.prisma",
   datasource: {
-    // Hardcoding the URL just to get the push to work!
-    url: "postgresql://neondb_owner:npg_jgBict69uMPs@ep-plain-sun-anjaxy3f.c-6.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require",
+    url: process.env.DATABASE_URL ?? "",
   },
 });
