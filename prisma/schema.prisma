@@ -43,6 +43,7 @@ model User {
   plan                  String        @default("FREE")
   planRenewsAt          DateTime?
   planStatus            String        @default("NONE")
+  chatsStarted          Int           @default(0)
   accounts              Account[]
   applications          Application[]
   payments              Payment[]

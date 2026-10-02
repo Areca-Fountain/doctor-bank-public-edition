@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import TopNav from "@/components/TopNav"; // 1. Import TopNav
+import UsageMeter from "@/components/UsageMeter";
 
 type SavedChat = {
   id: string;
@@ -75,6 +76,10 @@ export default function DashboardPage() {
              <p className="text-gray-600 font-medium text-lg leading-relaxed">
                Welcome back! Here you can view, manage, and continue all of your previous banking application sessions.
              </p>
+
+             <div className="mt-auto pt-6">
+               <UsageMeter showMessages={false} />
+             </div>
           </div>
         </div>
 
