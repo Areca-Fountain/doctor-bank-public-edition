@@ -9,10 +9,10 @@ export default function Hero() {
       
       {/* Main titles */}
       <h1 className="text-6xl md:text-8xl font-black tracking-tight text-brand-primary dark:text-white mb-2">
-        World's No.01
+        Simplified Banking
       </h1>
       <h2 className="text-6xl md:text-8xl font-black tracking-tight text-gray-400/50 mb-12">
-        Banking AI
+        AI Assistant
       </h2>
 
       {/* --- ROTATING TEXT SECTION --- */}

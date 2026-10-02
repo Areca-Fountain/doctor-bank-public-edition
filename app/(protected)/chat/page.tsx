@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import TopNav from "@/components/TopNav";
+import UsageMeter, { type Usage } from "@/components/UsageMeter";
 
 type Message = {
   role: "user" | "model";
@@ -25,6 +26,8 @@ function ChatMainLogic() {
   ]);
   const [inputText, setInputText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [limitReached, setLimitReached] = useState(false);
+  const [usageTick, setUsageTick] = useState(0); // bump to reload the counter
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -59,6 +62,15 @@ function ChatMainLogic() {
       setIsFetchingHistory(false);
     }
   }, [urlChatId]);
+
+  // Lock the input when the Free allowance is used up (the server enforces this too)
+  const handleUsage = (u: Usage) => {
+    if (u.plan === "PRO") {
+      setLimitReached(false);
+      return;
+    }
+    setLimitReached(chatId ? u.messagesUsed >= u.messagesLimit : u.chatsUsed >= u.chatsLimit);
+  };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -101,6 +113,9 @@ function ChatMainLogic() {
       });
 
       const data = await res.json();
+
+      if (data.limitReached) setLimitReached(true);
+      setUsageTick((t) => t + 1); // refresh the counter after every message
 
       // If the server created a new chat record, save its ID
       if (data.applicationId && !chatId) {
@@ -194,19 +209,26 @@ function ChatMainLogic() {
               <div ref={messagesEndRef} />
             </div>
 
+            <UsageMeter
+              chatId={chatId}
+              refreshKey={usageTick}
+              onUsage={handleUsage}
+              className="mb-4"
+            />
+
             <div className="w-full relative mt-auto">
               <input 
                 type="text" 
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-                placeholder="Type Your Message Here"
+                placeholder={limitReached ? "Free plan limit reached" : "Type Your Message Here"}
                 className="w-full bg-transparent border border-gray-300 rounded-full pl-6 pr-16 py-4 outline-none focus:border-brand-primary transition-colors text-gray-700 font-medium"
-                disabled={isLoading}
+                disabled={isLoading || limitReached}
               />
               <button 
                 onClick={handleSendMessage}
-                disabled={isLoading || !inputText.trim()}
+                disabled={isLoading || limitReached || !inputText.trim()}
                 className="absolute right-3 top-1/2 -translate-y-1/2 bg-brand-primary hover:bg-brand-primary/90 text-white rounded-full w-10 h-10 flex items-center justify-center disabled:opacity-50 transition-opacity"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

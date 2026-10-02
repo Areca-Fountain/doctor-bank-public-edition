@@ -1,20 +1,47 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { Prisma } from "@prisma/client";
 import prisma from "@/lib/db";
 import { PDFCheckBox, PDFDocument, PDFRadioGroup, PDFTextField } from "pdf-lib";
 import { getServerSession } from "next-auth/next";
 import { NextResponse } from "next/server";
 import { authOptions } from "../auth/[...nextauth]/route";
+import { FREE_CHAT_LIMIT, FREE_MESSAGE_LIMIT, isProUser } from "@/lib/plans";
 
-type ChatHistoryMessage = { role: string; text: string; };
-type ExtractedData = Prisma.InputJsonObject;
+type ChatHistoryMessage = { role: string; text: string };
+type ExtractedData = Record<string, string | number | boolean | null>;
 
 const normalizeValue = (value: string) => value.toLowerCase().replace(/[^a-z0-9]/g, "");
+
+// Turns whatever is stored/sent into a clean list of { role, text } messages
+const toHistory = (value: unknown): ChatHistoryMessage[] => {
+  if (!Array.isArray(value)) return [];
+  return value.filter((item): item is ChatHistoryMessage => {
+    const msg = item as Partial<ChatHistoryMessage> | null;
+    return !!msg && typeof msg.role === "string" && typeof msg.text === "string";
+  });
+};
+
+const limitResponse = (reason: "FREE_CHAT_LIMIT" | "FREE_MESSAGE_LIMIT") =>
+  NextResponse.json(
+    {
+      text:
+        reason === "FREE_CHAT_LIMIT"
+          ? `You've used your free chat. The Free plan includes ${FREE_CHAT_LIMIT} chat with up to ${FREE_MESSAGE_LIMIT} messages. Upgrade to Full House for unlimited chats and messages.`
+          : `You've reached the ${FREE_MESSAGE_LIMIT}-message limit for this chat on the Free plan. Upgrade to Full House to keep going.`,
+      limitReached: true,
+      reason,
+    },
+    { status: 403 }
+  );
 
 export async function POST(req: Request) {
   try {
     const geminiApiKey = process.env.GEMINI_API_KEY;
     if (!geminiApiKey) return NextResponse.json({ text: "Server configuration error." }, { status: 500 });
+
+    // Plan limits can only be enforced for logged-in users
+    const session = await getServerSession(authOptions);
+    const userEmail = session?.user?.email;
+    if (!userEmail) return NextResponse.json({ text: "Please log in to continue." }, { status: 401 });
 
     const body = (await req.json()) as {
       applicationId?: string | null;
@@ -26,14 +53,39 @@ export async function POST(req: Request) {
     const applicationId = body.applicationId || null;
     const message = typeof body.message === "string" ? body.message.trim() : "";
     const pdfData = typeof body.pdfData === "string" ? body.pdfData : "";
-    const history = Array.isArray(body.history) ? body.history : [];
     const todayDate = new Date().toLocaleDateString("en-GB");
-
-    const session = await getServerSession(authOptions);
-    const userEmail = session?.user?.email;
 
     if (!message) return NextResponse.json({ text: "Please enter a message to continue." }, { status: 400 });
     if (!pdfData) return NextResponse.json({ text: "Please upload a PDF form first to start the interview!" }, { status: 400 });
+
+    const user =
+      (await prisma.user.findUnique({ where: { email: userEmail } })) ??
+      (await prisma.user.create({ data: { email: userEmail } }));
+    const isPro = isProUser(user);
+
+    // Load the existing chat from the database (never trust the browser for ownership or counts)
+    let application: { id: string; chatHistory: unknown } | null = null;
+    if (applicationId) {
+      application = await prisma.application.findFirst({
+        where: { id: applicationId, userId: user.id },
+        select: { id: true, chatHistory: true },
+      });
+      if (!application) return NextResponse.json({ text: "Chat not found." }, { status: 404 });
+    }
+
+    const storedHistory = application ? toHistory(application.chatHistory) : [];
+    const messagesBefore = storedHistory.filter((m) => m.role === "user").length;
+
+    // --- FREE PLAN LIMITS ---
+    if (!isPro) {
+      if (!application && user.chatsStarted >= FREE_CHAT_LIMIT) return limitResponse("FREE_CHAT_LIMIT");
+      if (application && messagesBefore >= FREE_MESSAGE_LIMIT) return limitResponse("FREE_MESSAGE_LIMIT");
+    }
+
+    // Existing chats use the saved history; a new chat only keeps the opening greeting
+    const history = application
+      ? storedHistory
+      : toHistory(body.history).filter((m) => m.role === "model").slice(0, 1);
 
     const pdfBuffer = Buffer.from(pdfData, "base64");
     const genAI = new GoogleGenerativeAI(geminiApiKey);
@@ -64,14 +116,16 @@ export async function POST(req: Request) {
       - Output FINISHED_INTERVIEW followed by raw JSON. Do not use markdown code fences.
     `;
 
-    const model = genAI.getGenerativeModel({ model: "gemini-3.8-flash", systemInstruction: prompt });
+    // Set GEMINI_MODEL in .env.local to change the model without editing code
+    const model = genAI.getGenerativeModel({
+      model: process.env.GEMINI_MODEL || "gemini-3.5-flash-lite",
+      systemInstruction: prompt,
+    });
 
-    const formattedHistory = history
-      .filter((msg): msg is ChatHistoryMessage => !!msg && typeof msg.role === "string" && typeof msg.text === "string")
-      .map((msg) => ({
-        role: msg.role === "user" ? "user" : "model",
-        parts: [{ text: msg.text }],
-      }));
+    const formattedHistory = history.map((msg) => ({
+      role: msg.role === "user" ? "user" : "model",
+      parts: [{ text: msg.text }],
+    }));
 
     if (formattedHistory.length > 0 && formattedHistory[0].role === "model") {
       formattedHistory.unshift({ role: "user", parts: [{ text: "Hello! I have uploaded a PDF form. Please analyze it." }] });
@@ -85,7 +139,7 @@ export async function POST(req: Request) {
     const isPartialDownload = responseText.includes("PARTIAL_DOWNLOAD");
 
     let filledPdfBase64: string | null = null;
-    let extractedData: any = {};
+    let extractedData: ExtractedData = {};
 
     // Handle extraction and PDF filling if finished
     if (isFinished || isPartialDownload) {
@@ -128,51 +182,66 @@ export async function POST(req: Request) {
     }
 
     // --- DATABASE CONTINUOUS SAVE LOGIC ---
-    let currentAppId = applicationId;
-    const fullChatHistory = [...history, { role: "user", text: message }, { role: "model", text: responseText }];
+    let currentAppId: string | null = application?.id ?? null;
+    const fullChatHistory: ChatHistoryMessage[] = [
+      ...history,
+      { role: "user", text: message },
+      { role: "model", text: responseText },
+    ];
 
-    if (userEmail) {
-      try {
-        let user = await prisma.user.findUnique({ where: { email: userEmail } });
-        if (!user) user = await prisma.user.create({ data: { email: userEmail } });
+    const docName = extractedData["Business Name"]
+      ? String(extractedData["Business Name"])
+      : (isFinished ? "Completed Bank Application" : "Bank Application - In Progress");
 
-        const docName = extractedData["Business Name"] ? String(extractedData["Business Name"]) : (isFinished ? "Completed Bank Application" : "Bank Application - In Progress");
-
-        if (currentAppId) {
-          // Update the history of the ongoing chat
-          await prisma.application.update({
-            where: { id: currentAppId },
-            data: {
-              chatHistory: fullChatHistory,
-              ...(isFinished ? {
-                data: extractedData,
-                pdfName: docName,
-                pdfData: filledPdfBase64 || pdfData
-              } : {})
-            }
+    try {
+      if (application) {
+        // Update the history of the ongoing chat
+        await prisma.application.update({
+          where: { id: application.id },
+          data: {
+            chatHistory: fullChatHistory,
+            ...(isFinished ? {
+              data: extractedData,
+              pdfName: docName,
+              pdfData: filledPdfBase64 || pdfData,
+            } : {}),
+          },
+        });
+      } else {
+        // First message: claim the chat slot and create the record in one transaction.
+        // For Free users the slot is only claimed if they are still under the limit,
+        // so two simultaneous requests can't both create a chat.
+        const newApp = await prisma.$transaction(async (tx) => {
+          const claimed = await tx.user.updateMany({
+            where: isPro ? { id: user.id } : { id: user.id, chatsStarted: { lt: FREE_CHAT_LIMIT } },
+            data: { chatsStarted: { increment: 1 } },
           });
-        } else {
-          // Create the chat record on the very first message!
-          const newApp = await prisma.application.create({
+          if (claimed.count === 0) return null;
+
+          return tx.application.create({
             data: {
               userId: user.id,
               pdfName: docName,
               data: isFinished ? extractedData : {},
               chatHistory: fullChatHistory,
               pdfData: isFinished ? (filledPdfBase64 || pdfData) : pdfData,
-            }
+            },
+            select: { id: true },
           });
-          currentAppId = newApp.id;
-        }
-      } catch (dbError) {
-        console.error("DB Save Error:", dbError);
+        });
+
+        if (!newApp) return limitResponse("FREE_CHAT_LIMIT");
+        currentAppId = newApp.id;
       }
+    } catch (dbError) {
+      console.error("DB Save Error:", dbError);
     }
 
     return NextResponse.json({
       text: responseText,
       pdfBase64: filledPdfBase64,
-      applicationId: currentAppId // Send ID back to frontend so it doesn't create dupes
+      applicationId: currentAppId, // Send ID back to frontend so it doesn't create dupes
+      usage: isPro ? null : { messagesUsed: messagesBefore + 1, messagesLimit: FREE_MESSAGE_LIMIT },
     });
 
   } catch (error: unknown) {
