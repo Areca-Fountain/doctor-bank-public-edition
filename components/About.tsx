@@ -19,25 +19,25 @@ const teamMembers: TeamMember[] = [
     name: "Pasindu",
     role: "AI Engineer",
     image: "/pasinduphoto.jpeg",
-    linkedin: "www.linkedin.com/in/pasindu-thambugala",
+    linkedin: "https://www.linkedin.com/in/pasindu-thambugala",
   },
   {
     name: "Isuru",
     role: "UI/UX Designer",
     image: "/isuruphoto.jpg",
-    linkedin: "www.linkedin.com/in/isuru-mihiranga-37043136a",
+    linkedin: "https://www.linkedin.com/in/isuru-mihiranga-37043136a",
   },
   {
     name: "Risla",
     role: "Backend Lead",
     image: "/rislaphoto.jpeg",
-    linkedin: "linkedin.com/in/risla-niyas-81346a385",
+    linkedin: "https://www.linkedin.com/in/risla-niyas-81346a385",
   },
   {
     name: "Samha",
     role: "Data Analyst",
     image: "/samhaphoto.jpeg",
-    linkedin: "linkedin.com/in/samha-sarook-7b2679369",
+    linkedin: "https://www.linkedin.com/in/samha-sarook-7b2679369",
   },
 ];
 
@@ -61,13 +61,13 @@ export default function About() {
         {teamMembers.map((member, index) => (
           <div 
             key={index}
-            className="group relative w-full max-w-[240px] bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl p-6 flex flex-col items-center shadow-sm hover:shadow-2xl hover:shadow-purple-500/20 hover:border-purple-500/50 transition-all duration-300 ease-out hover:-translate-y-2 overflow-hidden"
+            className="group relative w-full max-w-60 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl p-6 flex flex-col items-center shadow-sm hover:shadow-2xl hover:shadow-purple-500/20 hover:border-purple-500/50 transition-all duration-300 ease-out hover:-translate-y-2 overflow-hidden"
           >
             {/* Soft Ambient Glow on Hover */}
-            <div className="absolute inset-0 bg-gradient-to-b from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+            <div className="absolute inset-0 bg-linear-to-b from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
 
             {/* Profile Avatar with Hover Zoom */}
-            <div className="relative w-24 h-24 rounded-full p-1 bg-gradient-to-tr from-[#4C1D95] via-[#9333EA] to-purple-400 shadow-md mb-4 group-hover:scale-105 transition-transform duration-300">
+            <div className="relative w-24 h-24 rounded-full p-1 bg-linear-to-tr from-[#4C1D95] via-[#9333EA] to-purple-400 shadow-md mb-4 group-hover:scale-105 transition-transform duration-300">
               <div className="w-full h-full rounded-full overflow-hidden bg-gray-100 dark:bg-gray-800">
                 <img 
                   src={member.image} 

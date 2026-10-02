@@ -9,6 +9,8 @@ interface Particle {
   directionY: number;
   size: number;
   color: string;
+  draw(): void;
+  update(): void;
 }
 
 export default function ParticleBackground() {
@@ -67,8 +69,8 @@ export default function ParticleBackground() {
       }
 
       update() {
-        if (this.x > canvas!.width || this.x < 0) this.directionX = -this.directionX;
-        if (this.y > canvas!.height || this.y < 0) this.directionY = -this.directionY;
+        if (this.x > window.innerWidth || this.x < 0) this.directionX = -this.directionX;
+        if (this.y > window.innerHeight || this.y < 0) this.directionY = -this.directionY;
 
         // Mouse repulsion
         if (mouse.x !== null && mouse.y !== null) {
@@ -92,12 +94,12 @@ export default function ParticleBackground() {
 
     const init = () => {
       particles = [];
-      const count = getParticleCount(canvas.width, canvas.height);
+      const count = getParticleCount(window.innerWidth, window.innerHeight);
       colors = getColors();
       for (let i = 0; i < count; i++) {
         const size = Math.random() * 2 + 1;
-        const x = Math.random() * (canvas.width - size * 2) + size * 2;
-        const y = Math.random() * (canvas.height - size * 2) + size * 2;
+        const x = Math.random() * (window.innerWidth - size * 2) + size * 2;
+        const y = Math.random() * (window.innerHeight - size * 2) + size * 2;
         const directionX = Math.random() * 0.4 - 0.2;
         const directionY = Math.random() * 0.4 - 0.2;
         particles.push(new ParticleClass(x, y, directionX, directionY, size, colors.dot));
@@ -149,7 +151,7 @@ export default function ParticleBackground() {
     const animate = () => {
       animationFrameId = requestAnimationFrame(animate);
       // Clear with transparency so page background shows through
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
       for (let i = 0; i < particles.length; i++) {
         particles[i].update();

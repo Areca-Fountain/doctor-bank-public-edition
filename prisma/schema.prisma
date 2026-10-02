@@ -42,7 +42,14 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
-  applications  Application[] 
+  applications  Application[]
+
+  // --- PAYMENTS (PayHere) ---
+  plan                  String    @default("FREE")  // FREE | PRO
+  planStatus            String    @default("NONE")  // NONE | ACTIVE | PAST_DUE | CANCELLED | CHARGEDBACK
+  planRenewsAt          DateTime?
+  payhereSubscriptionId String?
+  payments              Payment[]
 }
 
 model VerificationToken {
@@ -61,5 +68,23 @@ model Application {
   chatHistory Json?    // <-- Saves the chat messages
   pdfData     String?  @db.Text // <-- Saves the PDF file 
   createdAt   DateTime @default(now())
-  user        User     @relation(fields: [userId], references: [id])
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// --- PAYHERE PAYMENT LOG ---
+// id is used as the PayHere order_id
+model Payment {
+  id               String   @id @default(cuid())
+  userId           String
+  amount           Decimal  @db.Decimal(12, 2)
+  currency         String
+  status           String   @default("PENDING") // PENDING | SUCCESS | FAILED | CANCELLED | CHARGEDBACK
+  payherePaymentId String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
