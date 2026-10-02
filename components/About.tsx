@@ -110,11 +110,11 @@ export default function About() {
 
   return (
     <section id="about" className="mt-32 flex flex-col items-center text-center px-4 w-full max-w-7xl mx-auto mb-24">
-      <p className="tracking-[0.4em] text-xs font-bold text-purple-600 dark:text-purple-400 uppercase mb-3">
+      <p className="tracking-[0.4em] text-xs font-bold text-brand-primary dark:text-white uppercase mb-3">
         ABOUT US
       </p>
       
-      <h3 className="text-4xl md:text-5xl font-black text-[#4C1D95] dark:text-white tracking-tight mb-4">
+      <h3 className="text-4xl md:text-5xl font-black text-black dark:text-white tracking-tight mb-4">
         Meet the Team
       </h3>
       
@@ -130,8 +130,8 @@ export default function About() {
         onMouseLeave={() => setIsHovered(false)}
       >
         {/* Left & Right Gradient Blur Fades */}
-        <div className="absolute left-0 top-0 bottom-0 w-16 md:w-32 bg-linear-to-r from-white dark:from-[#0B0512] to-transparent z-20 pointer-events-none" />
-        <div className="absolute right-0 top-0 bottom-0 w-16 md:w-32 bg-linear-to-l from-white dark:from-[#0B0512] to-transparent z-20 pointer-events-none" />
+        <div className="absolute left-0 top-0 bottom-0 w-16 md:w-32 bg-linear-to-r from-white dark:from-black to-transparent z-20 pointer-events-none" />
+        <div className="absolute right-0 top-0 bottom-0 w-16 md:w-32 bg-linear-to-l from-white dark:from-black to-transparent z-20 pointer-events-none" />
 
         {/* Dynamic Infinite Moving Track */}
         <motion.div
@@ -185,13 +185,13 @@ function TeamCard({ member }: { member: TeamMember }) {
       onMouseLeave={handleMouseLeave}
       animate={{ rotateX, rotateY }}
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
-      className="group relative w-60 shrink-0 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl p-6 flex flex-col items-center shadow-md hover:shadow-2xl hover:shadow-purple-500/20 hover:border-purple-500/50 transition-shadow duration-300 overflow-hidden [transform-style:preserve-3d]"
+      className="group relative w-60 shrink-0 bg-white dark:bg-black border border-gray-200 dark:border-gray-800 rounded-3xl p-6 flex flex-col items-center shadow-md hover:shadow-2xl hover:shadow-brand-primary/20 hover:border-brand-primary/50 transition-shadow duration-300 overflow-hidden [transform-style:preserve-3d]"
     >
       {/* Soft Ambient Glow on Hover */}
-      <div className="absolute inset-0 bg-linear-to-b from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+      <div className="absolute inset-0 bg-linear-to-b from-brand-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
 
       {/* Profile Avatar */}
-      <div className="relative w-24 h-24 rounded-full p-1 bg-linear-to-tr from-[#4C1D95] via-[#9333EA] to-purple-400 shadow-md mb-4 group-hover:scale-105 transition-transform duration-300 [transform:translateZ(20px)]">
+      <div className="relative w-24 h-24 rounded-full p-1 bg-linear-to-tr from-brand-primary via-brand-primary to-white shadow-md mb-4 group-hover:scale-105 transition-transform duration-300 [transform:translateZ(20px)]">
         <div className="w-full h-full rounded-full overflow-hidden bg-gray-100 dark:bg-gray-800">
           <img 
             src={member.image} 
@@ -202,7 +202,7 @@ function TeamCard({ member }: { member: TeamMember }) {
       </div>
 
       {/* Name & Role */}
-      <h4 className="font-bold text-[#4C1D95] dark:text-white text-base group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors duration-300 [transform:translateZ(15px)]">
+      <h4 className="font-bold text-black dark:text-white text-base group-hover:text-brand-primary dark:group-hover:text-white transition-colors duration-300 [transform:translateZ(15px)]">
         {member.name}
       </h4>
       <p className="text-xs text-gray-500 dark:text-gray-400 font-medium mb-6 [transform:translateZ(10px)]">

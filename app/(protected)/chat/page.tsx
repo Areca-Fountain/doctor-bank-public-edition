@@ -139,8 +139,8 @@ function ChatMainLogic() {
           
           {isFetchingHistory && (
             <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/60 backdrop-blur-sm rounded-[50px]">
-              <div className="w-16 h-16 border-4 border-[#D9D9D9] border-t-[#011F4B] rounded-full animate-spin"></div>
-              <h2 className="mt-6 text-2xl font-bold text-[#011F4B]">Retrieving Documents</h2>
+              <div className="w-16 h-16 border-4 border-[#D9D9D9] border-t-brand-primary rounded-full animate-spin"></div>
+              <h2 className="mt-6 text-2xl font-bold text-black">Retrieving Documents</h2>
               <p className="text-gray-600 mt-2 font-medium">Doctor Bank is securely loading your chat history...</p>
             </div>
           )}
@@ -154,7 +154,7 @@ function ChatMainLogic() {
               <input type="file" accept=".pdf" className="hidden" ref={fileInputRef} onChange={handleFileUpload} />
               <button 
                 onClick={() => fileInputRef.current?.click()} 
-                className="bg-[#011F4B] text-white font-bold text-lg py-3 px-8 rounded-full hover:bg-[#011F4B]/90 transition-colors shadow-md w-[80%]"
+                className="bg-brand-primary text-white font-bold text-lg py-3 px-8 rounded-full hover:bg-brand-primary/90 transition-colors shadow-md w-[80%]"
               >
                 Upload PDF
               </button>
@@ -163,7 +163,7 @@ function ChatMainLogic() {
             <div className="flex flex-col gap-4 flex-1 overflow-y-auto pr-2 mt-4">
               {uploadedFiles.map((file, index) => (
                 <div key={index} className="bg-[#F3F4F6] rounded-full px-5 py-3.5 flex items-center justify-between shadow-sm border border-gray-100">
-                  <span className="text-[#011F4B] font-bold text-sm truncate max-w-[140px]">{file.name}</span>
+                  <span className="text-black font-bold text-sm truncate max-w-[140px]">{file.name}</span>
                   <span className="text-gray-400 text-xs">{file.date}</span>
                 </div>
               ))}
@@ -178,8 +178,8 @@ function ChatMainLogic() {
                   <div 
                     className={`max-w-[70%] px-6 py-4 rounded-[20px] text-[15px] whitespace-pre-wrap font-semibold
                       ${msg.role === "user" 
-                        ? "bg-transparent border border-[#011F4B] text-[#011F4B] rounded-tr-sm" 
-                        : "bg-white text-[#011F4B] shadow-sm rounded-tl-sm"
+                        ? "bg-transparent border border-brand-primary text-brand-primary rounded-tr-sm"
+                        : "bg-white text-black shadow-sm rounded-tl-sm"
                       }`}
                   >
                     {msg.text}
@@ -201,13 +201,13 @@ function ChatMainLogic() {
                 onChange={(e) => setInputText(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
                 placeholder="Type Your Message Here"
-                className="w-full bg-transparent border border-gray-300 rounded-full pl-6 pr-16 py-4 outline-none focus:border-[#011F4B] transition-colors text-gray-700 font-medium"
+                className="w-full bg-transparent border border-gray-300 rounded-full pl-6 pr-16 py-4 outline-none focus:border-brand-primary transition-colors text-gray-700 font-medium"
                 disabled={isLoading}
               />
               <button 
                 onClick={handleSendMessage}
                 disabled={isLoading || !inputText.trim()}
-                className="absolute right-3 top-1/2 -translate-y-1/2 bg-[#011F4B] hover:bg-[#011F4B]/90 text-white rounded-full w-10 h-10 flex items-center justify-center disabled:opacity-50 transition-opacity"
+                className="absolute right-3 top-1/2 -translate-y-1/2 bg-brand-primary hover:bg-brand-primary/90 text-white rounded-full w-10 h-10 flex items-center justify-center disabled:opacity-50 transition-opacity"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M12 19V5M5 12l7-7 7 7"/>

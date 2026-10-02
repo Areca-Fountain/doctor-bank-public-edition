@@ -5,12 +5,12 @@
 
 :root {
   --background: #FFFFFF;
-  --foreground: #2E1065; /* Deep Purple text */
+  --foreground: #000000;
 }
 
 .dark {
-  --background: #0B0512; /* Very dark purple/black background */
-  --foreground: #F8FAFC;
+  --background: #000000;
+  --foreground: #FFFFFF;
 }
 
 @theme inline {

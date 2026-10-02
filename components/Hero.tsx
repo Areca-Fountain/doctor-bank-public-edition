@@ -46,7 +46,7 @@ export default function Hero() {
       {/* Connected CTA Link */}
       <Link 
         href="/chat" 
-        className="mt-14 flex items-center gap-4 bg-white dark:bg-[#0f172a] shadow-xl border border-gray-100 dark:border-white/10 rounded-full pl-6 pr-2 py-2 text-lg font-bold text-brand-primary dark:text-white hover:scale-105 transition-transform duration-200"
+        className="mt-14 flex items-center gap-4 bg-white dark:bg-black shadow-xl border border-gray-100 dark:border-white/10 rounded-full pl-6 pr-2 py-2 text-lg font-bold text-brand-primary dark:text-white hover:scale-105 transition-transform duration-200"
       >
         Chat with Doctor Bank
         <span className="bg-brand-primary dark:bg-white text-white dark:text-brand-primary px-6 py-2 rounded-full text-sm font-semibold transition-colors">

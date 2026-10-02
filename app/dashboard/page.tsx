@@ -68,7 +68,7 @@ export default function DashboardPage() {
         {/* Left Side: Welcome Banner / Info */}
         <div className="w-1/3 flex flex-col gap-6 pt-4">
           <div className="bg-[#D9D9D9] rounded-[40px] p-10 h-full flex flex-col shadow-sm relative overflow-hidden">
-             <h1 className="text-4xl font-black text-[#011F4B] mb-4">
+             <h1 className="text-4xl font-black text-black mb-4">
                {session?.user?.name ? `${session.user.name.split(' ')[0]}'s` : "Your"}<br/>
                Dashboard
              </h1>
@@ -81,7 +81,7 @@ export default function DashboardPage() {
         {/* Right Side: Scrollable Saved Chats */}
         <div className="w-2/3 bg-[#F0F2F0] rounded-[40px] p-8 flex flex-col shadow-inner relative">
           <div className="flex justify-between items-center mb-6 px-2">
-            <h2 className="text-2xl font-bold text-[#011F4B]">Saved Chats</h2>
+            <h2 className="text-2xl font-bold text-black">Saved Chats</h2>
             <button 
               onClick={handleDeleteAll}
               disabled={chats.length === 0}
@@ -100,7 +100,7 @@ export default function DashboardPage() {
               chats.map((chat) => (
                 <div key={chat.id} className="bg-white rounded-[25px] p-5 flex items-center justify-between shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
                   <div className="bg-[#D9D9D9] px-6 py-3 rounded-full flex items-center">
-                     <span className="text-[#011F4B] font-bold truncate max-w-[200px]">{chat.pdfName}</span>
+                     <span className="text-black font-bold truncate max-w-[200px]">{chat.pdfName}</span>
                   </div>
 
                   <div className="flex items-center gap-4">
@@ -109,7 +109,7 @@ export default function DashboardPage() {
                     </p>
                     <Link 
                       href={`/chat?id=${chat.id}`} 
-                      className="bg-[#011F4B] hover:bg-[#011F4B]/90 text-white font-bold py-3 px-8 rounded-full transition-colors shadow-sm"
+                      className="bg-brand-primary hover:bg-brand-primary/90 text-white font-bold py-3 px-8 rounded-full transition-colors shadow-sm"
                     >
                       Continue
                     </Link>

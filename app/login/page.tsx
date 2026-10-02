@@ -16,9 +16,9 @@ export default function LoginPage() {
         <div className="bg-[#D9D9D9] w-full max-w-md rounded-[40px] p-12 flex flex-col items-center shadow-sm">
           
           {/* Blue Circle with Piggy Bank */}
-          <div className="bg-[#3B82F6] w-48 h-48 rounded-full flex items-center justify-center mb-12 shadow-inner p-6 relative overflow-hidden">
+          <div className="bg-brand-primary w-48 h-48 rounded-full flex items-center justify-center mb-12 shadow-inner p-6 relative overflow-hidden">
              {/* Replace with your actual white piggy bank logo if you have an SVG */}
-             <div className="w-full h-full bg-[#011F4B] rounded-full flex items-center justify-center">
+             <div className="w-full h-full bg-black rounded-full flex items-center justify-center">
 <img 
   src="/logo.svg" 
   alt="Doctor Bank Logo" 
@@ -30,7 +30,7 @@ export default function LoginPage() {
           {/* Sign In With Google Button */}
           <button 
             onClick={() => signIn("google", { callbackUrl: "/chat" })}
-            className="w-full bg-[#011F4B] hover:bg-[#011F4B]/90 text-white rounded-full py-3 px-2 flex items-center gap-4 transition-colors shadow-md group"
+            className="w-full bg-brand-primary hover:bg-brand-primary/90 text-white rounded-full py-3 px-2 flex items-center gap-4 transition-colors shadow-md group"
           >
             {/* White circle with Google 'G' */}
             <div className="bg-white w-10 h-10 rounded-full flex items-center justify-center shrink-0 ml-1">
@@ -48,7 +48,7 @@ export default function LoginPage() {
           <div className="mt-6">
             <button 
               onClick={() => signIn("google", { callbackUrl: "/chat" })}
-              className="text-[#011F4B] font-bold text-[17px] underline underline-offset-4 hover:text-[#011F4B]/80 transition-colors"
+              className="text-brand-primary font-bold text-[17px] underline underline-offset-4 hover:text-brand-primary/80 transition-colors"
             >
               or Sign Up Now
             </button>
