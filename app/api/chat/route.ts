@@ -64,7 +64,7 @@ export async function POST(req: Request) {
       - Output FINISHED_INTERVIEW followed by raw JSON. Do not use markdown code fences.
     `;
 
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash", systemInstruction: prompt });
+    const model = genAI.getGenerativeModel({ model: "gemini-3.8-flash", systemInstruction: prompt });
 
     const formattedHistory = history
       .filter((msg): msg is ChatHistoryMessage => !!msg && typeof msg.role === "string" && typeof msg.text === "string")
