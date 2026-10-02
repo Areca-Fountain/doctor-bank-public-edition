@@ -36,7 +36,7 @@ export default function ParticleBackground() {
     const getColors = () => {
       const isDark = document.documentElement.classList.contains("dark");
       return {
-        dot: isDark ? "rgba(191, 128, 255, 0.85)" : "rgba(147, 51, 234, 0.55)",
+        dot: isDark ? "hsla(0, 0%, 95%, 0.85)" : "rgba(0, 170, 255, 0.55)",
         line: isDark ? "rgba(200, 150, 255, " : "rgba(147, 51, 234, ",
         lineNearMouse: isDark ? "rgba(255, 255, 255, " : "rgba(76, 29, 149, ",
       };

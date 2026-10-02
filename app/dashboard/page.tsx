@@ -2,10 +2,9 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { useSession, signOut } from "next-auth/react";
-import Image from "next/image";
+import { useSession } from "next-auth/react";
+import TopNav from "@/components/TopNav"; // 1. Import TopNav
 
-// Define the shape of our data based on your Prisma schema
 type SavedChat = {
   id: string;
   pdfName: string;
@@ -17,7 +16,6 @@ export default function DashboardPage() {
   const [chats, setChats] = useState<SavedChat[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Fetch chats when the page loads
   useEffect(() => {
     if (session?.user) {
       fetchChats();
@@ -43,7 +41,7 @@ export default function DashboardPage() {
     if (!confirm("Are you sure you want to delete this chat?")) return;
     try {
       const res = await fetch(`/api/applications?id=${id}`, { method: "DELETE" });
-      if (res.ok) fetchChats(); // Refresh the list
+      if (res.ok) fetchChats();
     } catch (error) {
       console.error("Failed to delete:", error);
     }
@@ -53,51 +51,23 @@ export default function DashboardPage() {
     if (!confirm("Are you sure you want to delete ALL saved chats? This cannot be undone.")) return;
     try {
       const res = await fetch(`/api/applications?all=true`, { method: "DELETE" });
-      if (res.ok) fetchChats(); // Refresh the list
+      if (res.ok) fetchChats();
     } catch (error) {
       console.error("Failed to delete all:", error);
     }
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col items-center pt-8 px-8">
+    <div className="min-h-screen bg-white flex flex-col items-center pt-24 px-8">
       
-      {/* --- DASHBOARD TOP NAVIGATION --- */}
-      <div className="w-full flex justify-center px-4 mb-12">
-        <nav className="bg-[#011F4B] rounded-[40px] px-2 py-2 flex items-center justify-between w-full max-w-[1100px] shadow-xl">
-          <div className="flex items-center gap-10 pl-2">
-            <Link href="/" className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center shrink-0 group">
-              <Image src="/logo.svg" alt="Doctor Bank" width={36} height={36} className="group-hover:scale-110 transition-transform duration-200" />
-            </Link>
-            <div className="hidden md:flex items-center gap-8 text-white text-[17px] font-medium">
-              <Link href="/" className="hover:text-white/80 transition-colors">Home</Link>
-              <Link href="/settings" className="hover:text-white/80 transition-colors">Go to Setting</Link>
-            </div>
-          </div>
-          <div className="flex items-center gap-6 pr-2">
-             <div className="bg-white rounded-full flex items-center gap-3 pr-6 py-1.5 shadow-md">
-                <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 border border-gray-200 ml-1.5">
-                  <img 
-                    src={session?.user?.image || `https://ui-avatars.com/api/?name=${session?.user?.name || 'U'}&background=5C3A21&color=fff`} 
-                    alt="User Avatar" 
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <span className="text-[#011F4B] font-bold text-lg">
-                  {session?.user?.name?.split(' ')[0] || 'User'}
-                </span>
-              </div>
-          </div>
-        </nav>
-      </div>
+      {/* 2. Replace hardcoded navbar with TopNav */}
+      <TopNav view="dashboard" />
 
       {/* --- DASHBOARD MAIN CONTENT --- */}
       <div className="w-full max-w-[1300px] flex gap-8 h-[750px]">
-        
         {/* Left Side: Welcome Banner / Info */}
         <div className="w-1/3 flex flex-col gap-6 pt-4">
           <div className="bg-[#D9D9D9] rounded-[40px] p-10 h-full flex flex-col shadow-sm relative overflow-hidden">
-             {/* Updated dynamic user name heading */}
              <h1 className="text-4xl font-black text-[#011F4B] mb-4">
                {session?.user?.name ? `${session.user.name.split(' ')[0]}'s` : "Your"}<br/>
                Dashboard
@@ -110,7 +80,6 @@ export default function DashboardPage() {
 
         {/* Right Side: Scrollable Saved Chats */}
         <div className="w-2/3 bg-[#F0F2F0] rounded-[40px] p-8 flex flex-col shadow-inner relative">
-          
           <div className="flex justify-between items-center mb-6 px-2">
             <h2 className="text-2xl font-bold text-[#011F4B]">Saved Chats</h2>
             <button 
@@ -122,7 +91,6 @@ export default function DashboardPage() {
             </button>
           </div>
 
-          {/* Scrollable Container */}
           <div className="flex-1 overflow-y-auto pr-4 flex flex-col gap-4">
             {isLoading ? (
               <p className="text-gray-500 text-center mt-10 font-medium">Loading your chats...</p>
@@ -131,8 +99,6 @@ export default function DashboardPage() {
             ) : (
               chats.map((chat) => (
                 <div key={chat.id} className="bg-white rounded-[25px] p-5 flex items-center justify-between shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-                  
-                  {/* PDF Name Tag */}
                   <div className="bg-[#D9D9D9] px-6 py-3 rounded-full flex items-center">
                      <span className="text-[#011F4B] font-bold truncate max-w-[200px]">{chat.pdfName}</span>
                   </div>
@@ -141,14 +107,12 @@ export default function DashboardPage() {
                     <p className="text-sm text-gray-400 font-medium mr-2">
                       {new Date(chat.createdAt).toLocaleDateString()}
                     </p>
-                    {/* Continue Button */}
                     <Link 
                       href={`/chat?id=${chat.id}`} 
                       className="bg-[#011F4B] hover:bg-[#011F4B]/90 text-white font-bold py-3 px-8 rounded-full transition-colors shadow-sm"
                     >
                       Continue
                     </Link>
-                    {/* Delete Single Chat Button */}
                     <button 
                       onClick={() => handleDelete(chat.id)}
                       className="bg-[#FF0000] hover:bg-red-700 w-12 h-12 flex items-center justify-center rounded-full transition-colors shadow-sm text-white"
