@@ -44,12 +44,9 @@ model User {
   planRenewsAt          DateTime?
   planStatus            String        @default("NONE")
   chatsStarted          Int           @default(0)
-<<<<<<< Updated upstream
-=======
   role                  String        @default("USER") // USER | ADMIN
   suspended             Boolean       @default(false)
   createdAt             DateTime      @default(now())
->>>>>>> Stashed changes
   accounts              Account[]
   applications          Application[]
   payments              Payment[]
