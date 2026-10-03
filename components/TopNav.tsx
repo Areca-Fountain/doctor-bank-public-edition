@@ -20,7 +20,7 @@ const homeNavItems: NavItem[] = [
   { name: "Home", href: "/" },
   { name: "Pricing", href: "/#pricing" },
   { name: "About Us", href: "/#about" },
-  { name: "Academy", href: "/#academy" },
+  { name: "Academy", href: "/academy" },
 ];
 
 const dashboardNavItems: NavItem[] = [
