@@ -10,13 +10,13 @@ export default function LoginPage() {
       {/* Assuming you want your top navigation here as shown in the mockup */}
       <TopNav />
       
-      <div className="min-h-screen bg-white flex items-center justify-center p-4">
+      <div className="min-h-dvh bg-white flex items-center justify-center px-4 pt-24 pb-6">
         
         {/* The Gray Login Card */}
-        <div className="bg-[#D9D9D9] w-full max-w-md rounded-[40px] p-12 flex flex-col items-center shadow-sm">
+        <div className="bg-[#D9D9D9] w-full max-w-md rounded-3xl md:rounded-[40px] p-6 sm:p-12 flex flex-col items-center shadow-sm">
           
           {/* Blue Circle with Piggy Bank */}
-          <div className="bg-brand-primary w-48 h-48 rounded-full flex items-center justify-center mb-12 shadow-inner p-6 relative overflow-hidden">
+          <div className="bg-brand-primary w-36 h-36 sm:w-48 sm:h-48 rounded-full flex items-center justify-center mb-8 sm:mb-12 shadow-inner p-6 relative overflow-hidden">
              {/* Replace with your actual white piggy bank logo if you have an SVG */}
              <div className="w-full h-full bg-black rounded-full flex items-center justify-center">
 <img 
@@ -30,7 +30,7 @@ export default function LoginPage() {
           {/* Sign In With Google Button */}
           <button 
             onClick={() => signIn("google", { callbackUrl: "/chat" })}
-            className="w-full bg-brand-primary hover:bg-brand-primary/90 text-white rounded-full py-3 px-2 flex items-center gap-4 transition-colors shadow-md group"
+            className="w-full bg-brand-primary hover:bg-brand-primary/90 text-white rounded-full py-3 px-2 flex items-center gap-3 sm:gap-4 transition-colors shadow-md group touch-target"
           >
             {/* White circle with Google 'G' */}
             <div className="bg-white w-10 h-10 rounded-full flex items-center justify-center shrink-0 ml-1">
@@ -41,7 +41,7 @@ export default function LoginPage() {
                 <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/>
               </svg>
             </div>
-            <span className="font-semibold text-lg mx-auto pr-10">Sign in With Google</span>
+            <span className="font-semibold text-base sm:text-lg mx-auto pr-8 sm:pr-10">Sign in With Google</span>
           </button>
 
           {/* Sign Up Link */}
