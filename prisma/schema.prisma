@@ -44,6 +44,12 @@ model User {
   planRenewsAt          DateTime?
   planStatus            String        @default("NONE")
   chatsStarted          Int           @default(0)
+<<<<<<< Updated upstream
+=======
+  role                  String        @default("USER") // USER | ADMIN
+  suspended             Boolean       @default(false)
+  createdAt             DateTime      @default(now())
+>>>>>>> Stashed changes
   accounts              Account[]
   applications          Application[]
   payments              Payment[]
@@ -83,4 +89,17 @@ model Payment {
   user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+}
+
+// Record of what admins did (kept even after a user is deleted, so it stores emails, not relations)
+model AdminLog {
+  id            String   @id @default(cuid())
+  adminEmail    String
+  action        String
+  targetUserId  String?
+  targetEmail   String?
+  details       Json?
+  createdAt     DateTime @default(now())
+
+  @@index([createdAt])
 }

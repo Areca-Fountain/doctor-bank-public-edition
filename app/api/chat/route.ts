@@ -63,6 +63,13 @@ export async function POST(req: Request) {
       (await prisma.user.create({ data: { email: userEmail } }));
     const isPro = isProUser(user);
 
+<<<<<<< Updated upstream
+=======
+    if (user.suspended) {
+      return NextResponse.json({ text: "Your account has been suspended. Please contact support." }, { status: 403 });
+    }
+
+>>>>>>> Stashed changes
     // Load the existing chat from the database (never trust the browser for ownership or counts)
     let application: { id: string; chatHistory: unknown } | null = null;
     if (applicationId) {

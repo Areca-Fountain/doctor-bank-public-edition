@@ -28,7 +28,27 @@ const dashboardNavItems: NavItem[] = [
 
 export default function TopNav({ view = "home" }: TopNavProps) {
   const { data: session } = useSession();
-  const currentNavItems = view === "dashboard" ? dashboardNavItems : homeNavItems;
+  // Only admins get an extra "Admin" link (the server decides, see /api/admin/me)
+  const [isAdmin, setIsAdmin] = useState(false);
+  useEffect(() => {
+    if (!session?.user) {
+      setIsAdmin(false);
+      return;
+    }
+    let cancelled = false;
+    fetch("/api/admin/me", { cache: "no-store" })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!cancelled) setIsAdmin(!!data?.isAdmin);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [session?.user?.email]);
+
+  const baseNavItems = view === "dashboard" ? dashboardNavItems : homeNavItems;
+  const currentNavItems: NavItem[] = isAdmin ? [...baseNavItems, { name: "Admin", href: "/admin" }] : baseNavItems;
 
   const [activeTab, setActiveTab] = useState(currentNavItems[0]?.name || "Home");
   const [hoveredTab, setHoveredTab] = useState<string | null>(null);
