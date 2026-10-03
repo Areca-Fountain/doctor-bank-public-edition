@@ -10,6 +10,7 @@ export default function proxy(req: any, event: any) {
 export const config = {
   matcher: [
     "/chat/:path*", 
-    "/dashboard/:path*"
+    "/dashboard/:path*",
+    "/admin/:path*"
   ]
 };

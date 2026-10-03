@@ -19,6 +19,10 @@ export async function POST() {
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
+    if (user.suspended) {
+      return NextResponse.json({ error: "Your account has been suspended." }, { status: 403 });
+    }
+
     if (user.plan === "PRO" && user.planStatus === "ACTIVE") {
       return NextResponse.json({ error: "You already have an active plan." }, { status: 409 });
     }
