@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 import TopNav from "@/components/TopNav";
 import UsageMeter, { type Usage } from "@/components/UsageMeter";
 
@@ -32,7 +33,8 @@ function ChatMainLogic() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    // block: "nearest" scrolls only the chat box, never the whole page
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }, [messages]);
 
   useEffect(() => {
@@ -169,19 +171,27 @@ function ChatMainLogic() {
               <input type="file" accept=".pdf" className="hidden" ref={fileInputRef} onChange={handleFileUpload} />
               <button 
                 onClick={() => fileInputRef.current?.click()} 
-                className="bg-brand-primary text-white font-bold text-lg py-3 px-8 rounded-full hover:bg-brand-primary/90 transition-colors shadow-md w-[80%]"
+                className="bg-brand-primary text-white font-bold text-lg py-3 px-8 rounded-full hover:bg-brand-primary/90 hover:scale-105 active:scale-95 transition-all duration-200 shadow-md w-[80%]"
               >
                 Upload PDF
               </button>
             </div>
 
             <div className="flex flex-col gap-4 flex-1 overflow-y-auto pr-2 mt-4">
+              <AnimatePresence initial={false}>
               {uploadedFiles.map((file, index) => (
-                <div key={index} className="bg-[#F3F4F6] rounded-full px-5 py-3.5 flex items-center justify-between shadow-sm border border-gray-100">
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, x: -24 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                  className="bg-[#F3F4F6] rounded-full px-5 py-3.5 flex items-center justify-between shadow-sm border border-gray-100"
+                >
                   <span className="text-black font-bold text-sm truncate max-w-[140px]">{file.name}</span>
                   <span className="text-gray-400 text-xs">{file.date}</span>
-                </div>
+                </motion.div>
               ))}
+              </AnimatePresence>
             </div>
           </div>
 
@@ -189,7 +199,13 @@ function ChatMainLogic() {
           <div className="flex-1 bg-[#F0F2F0] rounded-[40px] relative p-8 flex flex-col z-10">
             <div className="flex-1 overflow-y-auto flex flex-col gap-6 mb-6 pr-4 pt-6">
               {messages.map((msg, idx) => (
-                <div key={idx} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, y: 14, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                  className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+                >
                   <div 
                     className={`max-w-[70%] px-6 py-4 rounded-[20px] text-[15px] whitespace-pre-wrap font-semibold
                       ${msg.role === "user" 
@@ -199,12 +215,22 @@ function ChatMainLogic() {
                   >
                     {msg.text}
                   </div>
-                </div>
+                </motion.div>
               ))}
               {isLoading && (
-                <div className="flex justify-start">
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-start items-center gap-3">
+                  <div className="flex items-center gap-1 bg-white rounded-full px-4 py-3 shadow-sm" aria-hidden="true">
+                    {[0, 1, 2].map((i) => (
+                      <motion.span
+                        key={i}
+                        className="w-2 h-2 rounded-full bg-gray-400"
+                        animate={{ y: [0, -5, 0], opacity: [0.4, 1, 0.4] }}
+                        transition={{ duration: 0.8, repeat: Infinity, delay: i * 0.15 }}
+                      />
+                    ))}
+                  </div>
                   <div className="text-gray-400 text-sm italic py-2">Doctor Bank is Typing...</div>
-                </div>
+                </motion.div>
               )}
               <div ref={messagesEndRef} />
             </div>
@@ -229,7 +255,7 @@ function ChatMainLogic() {
               <button 
                 onClick={handleSendMessage}
                 disabled={isLoading || limitReached || !inputText.trim()}
-                className="absolute right-3 top-1/2 -translate-y-1/2 bg-brand-primary hover:bg-brand-primary/90 text-white rounded-full w-10 h-10 flex items-center justify-center disabled:opacity-50 transition-opacity"
+                className="absolute right-3 top-1/2 -translate-y-1/2 bg-brand-primary hover:bg-brand-primary/90 text-white rounded-full w-10 h-10 flex items-center justify-center disabled:opacity-50 hover:scale-110 active:scale-90 transition-all duration-200"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M12 19V5M5 12l7-7 7 7"/>

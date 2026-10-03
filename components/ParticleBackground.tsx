@@ -29,7 +29,7 @@ export default function ParticleBackground() {
     // Reduce particle count on small screens for performance
     const getParticleCount = (w: number, h: number) => {
       const base = (w * h) / 12000;
-      return w < 768 ? Math.min(base, 60) : Math.min(base, 140);
+      return w < 768 ? Math.min(base, 45) : Math.min(base, 100);
     };
 
     // Read theme from the .dark class on <html>
@@ -107,7 +107,7 @@ export default function ParticleBackground() {
     };
 
     const resizeCanvas = () => {
-      const dpr = window.devicePixelRatio || 1;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
       canvas.width = window.innerWidth * dpr;
       canvas.height = window.innerHeight * dpr;
       canvas.style.width = `${window.innerWidth}px`;
@@ -150,6 +150,7 @@ export default function ParticleBackground() {
 
     const animate = () => {
       animationFrameId = requestAnimationFrame(animate);
+      if (document.hidden) return; // do not draw while the tab is in the background
       // Clear with transparency so page background shows through
       ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 

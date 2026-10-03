@@ -2,7 +2,8 @@
 
 import { signOut, useSession, signIn } from "next-auth/react";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, type MouseEvent } from "react";
+import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 
 interface NavItem {
@@ -26,8 +27,21 @@ const dashboardNavItems: NavItem[] = [
   { name: "Go to Setting", href: "/settings" },
 ];
 
+// Smoothly scroll to a section (or the top). Uses Lenis when the page has it, else the browser.
+const scrollToTarget = (target: HTMLElement | null) => {
+  const lenis = typeof window !== "undefined" ? window.__lenis : undefined;
+  if (!target) {
+    if (lenis) lenis.scrollTo(0, { duration: 1.2 });
+    else window.scrollTo({ top: 0, behavior: "smooth" });
+    return;
+  }
+  if (lenis) lenis.scrollTo(target, { offset: -100, duration: 1.2 });
+  else target.scrollIntoView({ behavior: "smooth", block: "start" });
+};
+
 export default function TopNav({ view = "home" }: TopNavProps) {
   const { data: session } = useSession();
+  const pathname = usePathname();
   // Only admins get an extra "Admin" link (the server decides, see /api/admin/me)
   const [isAdmin, setIsAdmin] = useState(false);
   useEffect(() => {
@@ -57,6 +71,56 @@ export default function TopNav({ view = "home" }: TopNavProps) {
     setActiveTab(currentNavItems[0]?.name || "Home");
   }, [view]);
 
+  // Highlight the tab of the section you are currently reading
+  useEffect(() => {
+    if (view !== "home" || pathname !== "/") return;
+
+    const sections = currentNavItems
+      .map((item) => ({ name: item.name, id: item.href.split("#")[1] }))
+      .filter((s) => !!s.id);
+
+    let ticking = false;
+    const update = () => {
+      ticking = false;
+      let current = currentNavItems[0]?.name || "Home";
+      for (const { name, id } of sections) {
+        const el = document.getElementById(id);
+        if (el && el.getBoundingClientRect().top <= window.innerHeight * 0.4) current = name;
+      }
+      setActiveTab(current);
+    };
+    const onScroll = () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(update);
+      }
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    update();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [view, pathname, isAdmin]);
+
+  // On the landing page, links like /#pricing glide to the section instead of jumping
+  const handleNavClick = (e: MouseEvent<HTMLAnchorElement>, item: NavItem) => {
+    setActiveTab(item.name);
+    if (pathname !== "/") return; // other pages: let Next.js navigate normally
+
+    if (item.href === "/") {
+      e.preventDefault();
+      scrollToTarget(null);
+      window.history.replaceState(null, "", "/");
+      return;
+    }
+
+    const id = item.href.split("#")[1];
+    const el = id ? document.getElementById(id) : null;
+    if (!el) return; // no such section on this page, fall back to normal link
+    e.preventDefault();
+    scrollToTarget(el);
+    window.history.replaceState(null, "", `/#${id}`);
+  };
+
   return (
     <div className="fixed top-8 w-full z-50 flex justify-center px-4 pointer-events-none">
       {/* Glassmorphism Floating Capsule Container */}
@@ -73,7 +137,7 @@ export default function TopNav({ view = "home" }: TopNavProps) {
               <Link
                 key={item.name}
                 href={item.href}
-                onClick={() => setActiveTab(item.name)}
+                onClick={(e) => handleNavClick(e, item)}
                 onMouseEnter={() => setHoveredTab(item.name)}
                 className="relative px-6 py-2.5 rounded-2xl text-base font-semibold transition-colors duration-200 select-none cursor-pointer flex items-center justify-center"
               >
