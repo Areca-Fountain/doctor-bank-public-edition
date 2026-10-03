@@ -18,9 +18,67 @@
   --color-foreground: var(--foreground);
 }
 
+/* Smooth scrolling must be on <html> (it does nothing on <body>).
+   scroll-padding-top keeps section titles clear of the fixed nav bar. */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 7rem;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: 'Inter', sans-serif;
-  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---- Lenis (inertia scrolling) required styles ---- */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
+/* ---- Click feedback for every button, without touching existing styles ----
+   Kept inside @layer base so any Tailwind class on a button still wins. */
+@layer base {
+  button,
+  a {
+    -webkit-tap-highlight-color: transparent;
+  }
+  button {
+    transition-property: color, background-color, border-color, box-shadow, opacity, transform;
+    transition-duration: 200ms;
+    transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  button:not(:disabled):active {
+    transform: scale(0.97);
+  }
+  :focus-visible {
+    outline: 2px solid #0022ff;
+    outline-offset: 3px;
+  }
+}
+
+/* Respect users who ask their system for less motion */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+  }
 }

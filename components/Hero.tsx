@@ -1,22 +1,38 @@
 "use client";
 
 import Link from "next/link";
+import { motion, type Variants } from "framer-motion";
 import RotatingText from './RotatingText'; 
+
+const container: Variants = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.14, delayChildren: 0.15 } },
+};
+
+const item: Variants = {
+  hidden: { opacity: 0, y: 36 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] } },
+};
 
 export default function Hero() {
   return (
-    <div className="flex flex-col items-center justify-center text-center w-full z-10 relative">
+    <motion.div
+      variants={container}
+      initial="hidden"
+      animate="show"
+      className="flex flex-col items-center justify-center text-center w-full z-10 relative"
+    >
       
       {/* Main titles */}
-      <h1 className="text-6xl md:text-8xl font-black tracking-tight text-brand-primary dark:text-white mb-2">
+      <motion.h1 variants={item} className="text-6xl md:text-8xl font-black tracking-tight text-brand-primary dark:text-white mb-2">
         Simplified Banking
-      </h1>
-      <h2 className="text-6xl md:text-8xl font-black tracking-tight text-gray-400/50 mb-12">
+      </motion.h1>
+      <motion.h2 variants={item} className="text-6xl md:text-8xl font-black tracking-tight text-gray-400/50 mb-12">
         AI Assistant
-      </h2>
+      </motion.h2>
 
       {/* --- ROTATING TEXT SECTION --- */}
-      <div className="flex items-center gap-3 text-2xl md:text-3xl font-bold mb-16 text-brand-primary dark:text-white">
+      <motion.div variants={item} className="flex items-center gap-3 text-2xl md:text-3xl font-bold mb-16 text-brand-primary dark:text-white">
         <span>For Your</span>
         
         <RotatingText
@@ -41,19 +57,21 @@ export default function Hero() {
         />
         
         <span>Needs</span>
-      </div>
+      </motion.div>
 
       {/* Connected CTA Link */}
+      <motion.div variants={item} className="mt-14">
       <Link 
         href="/chat" 
-        className="mt-14 flex items-center gap-4 bg-white dark:bg-black shadow-xl border border-gray-100 dark:border-white/10 rounded-full pl-6 pr-2 py-2 text-lg font-bold text-brand-primary dark:text-white hover:scale-105 transition-transform duration-200"
+        className="flex items-center gap-4 bg-white dark:bg-black shadow-xl border border-gray-100 dark:border-white/10 rounded-full pl-6 pr-2 py-2 text-lg font-bold text-brand-primary dark:text-white hover:scale-105 hover:shadow-2xl active:scale-95 transition-all duration-200"
       >
         Chat with Doctor Bank
         <span className="bg-brand-primary dark:bg-white text-white dark:text-brand-primary px-6 py-2 rounded-full text-sm font-semibold transition-colors">
           Start
         </span>
       </Link>
+      </motion.div>
 
-    </div>
+    </motion.div>
   );
 }

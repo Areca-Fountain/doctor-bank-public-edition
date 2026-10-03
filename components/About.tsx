@@ -5,8 +5,10 @@ import {
   motion,
   useMotionValue,
   useAnimationFrame,
+  useInView,
   PanInfo,
 } from "framer-motion";
+import Reveal from "./Reveal";
 
 interface TeamMember {
   name: string;
@@ -59,13 +61,15 @@ export default function About() {
   const x = useMotionValue(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+  // Stop the marquee loop while it is off-screen so scrolling elsewhere stays smooth
+  const inView = useInView(containerRef, { margin: "200px" });
 
   const baseSpeed = -0.8; // Auto-scroll speed
   const velocityRef = useRef(0);
 
   // Frame Loop for smooth infinite wrap and drag physics
   useAnimationFrame((_, delta) => {
-    if (!contentRef.current) return;
+    if (!contentRef.current || !inView) return;
 
     // Width of one single team set
     const singleSetWidth = contentRef.current.scrollWidth / 3;
@@ -110,6 +114,7 @@ export default function About() {
 
   return (
     <section id="about" className="mt-32 flex flex-col items-center text-center px-4 w-full max-w-7xl mx-auto mb-24">
+      <Reveal className="flex flex-col items-center">
       <p className="tracking-[0.4em] text-xs font-bold text-brand-primary dark:text-white uppercase mb-3">
         ABOUT US
       </p>
@@ -121,7 +126,9 @@ export default function About() {
       <p className="text-gray-500 dark:text-gray-400 italic text-sm font-medium max-w-xl mb-12">
         "We are Pioneers in Building Intelligence Systems for Financing & Banking."
       </p>
+      </Reveal>
 
+      <Reveal className="w-full" delay={0.15}>
       {/* 3D Dynamic Marquee Viewport Container */}
       <div 
         ref={containerRef}
@@ -150,6 +157,7 @@ export default function About() {
           ))}
         </motion.div>
       </div>
+      </Reveal>
     </section>
   );
 }
