@@ -53,7 +53,7 @@ export default function Pricing() {
   };
 
   return (
-    <section id="pricing" className="mt-32 flex flex-col items-center w-full px-4 mb-20">
+    <section id="pricing" className="mt-20 md:mt-32 flex flex-col items-center w-full px-4 mb-20">
       <Reveal className="text-center max-w-xl">
         <h3 className="text-4xl md:text-5xl font-black text-black dark:text-white tracking-tight">
           Plans & Pricing
@@ -63,7 +63,7 @@ export default function Pricing() {
         </p>
       </Reveal>
 
-      <div className="flex flex-col md:flex-row items-stretch justify-center gap-8 mt-12 w-full max-w-4xl">
+      <div className="flex flex-col md:flex-row items-stretch justify-center gap-6 md:gap-8 mt-8 md:mt-12 w-full max-w-4xl">
         {/* Free Plan */}
         <Reveal className="w-full max-w-[320px] flex self-center md:self-auto">
         <div className="w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl p-8 flex flex-col justify-between shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">

@@ -8,7 +8,7 @@ import ScrollProgress from "@/components/ScrollProgress";
 
 export default function LandingPage() {
   return (
-    <main className="min-h-screen relative flex flex-col items-center pt-40 pb-20 overflow-x-hidden" id="home">
+    <main className="min-h-screen relative flex flex-col items-center pt-28 md:pt-40 pb-20 overflow-x-hidden" id="home">
       <SmoothScroll />
       <ScrollProgress />
       <ThemeToggle />

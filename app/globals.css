@@ -50,6 +50,40 @@ html.lenis body {
   pointer-events: none;
 }
 
+/* ---- Adaptive layout helpers ---- */
+html {
+  /* stop iOS from inflating text in landscape */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+body {
+  overflow-x: hidden;
+  /* keep content clear of notches and home indicators */
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Touch screens: bigger tap targets, and never zoom the page when a field is focused (iOS zooms below 16px) */
+@media (pointer: coarse) {
+  .touch-target {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
+
+/* Mouse / trackpad only: hover effects. On touch they would "stick" after a tap. */
+@media (hover: none) {
+  .hover-only {
+    display: none !important;
+  }
+}
+
 /* ---- Click feedback for every button, without touching existing styles ----
    Kept inside @layer base so any Tailwind class on a button still wins. */
 @layer base {
