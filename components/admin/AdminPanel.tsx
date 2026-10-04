@@ -202,17 +202,17 @@ export default function AdminPanel({ currentAdminId }: { currentAdminId: string 
 
   return (
     <div className="w-full max-w-[1300px] flex flex-col gap-6">
-      <div className="flex items-center justify-between px-2">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-2">
         <div>
-          <h1 className="text-4xl font-black text-black">Admin Panel</h1>
+          <h1 className="text-3xl md:text-4xl font-black text-black">Admin Panel</h1>
           <p className="text-gray-600 font-medium mt-1">Manage users, plans and activity.</p>
         </div>
-        <div className="flex gap-2 rounded-full bg-[#F0F2F0] p-1">
+        <div className="flex gap-2 rounded-full bg-[#F0F2F0] p-1 w-full sm:w-auto">
           {(["users", "activity"] as const).map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
-              className={`rounded-full px-6 py-2 text-sm font-bold capitalize transition-colors ${
+              className={`flex-1 sm:flex-none rounded-full px-6 py-2.5 text-sm font-bold capitalize transition-colors touch-target ${
                 tab === t ? "bg-brand-primary text-white shadow-sm" : "text-gray-700 hover:text-black"
               }`}
             >
@@ -224,7 +224,7 @@ export default function AdminPanel({ currentAdminId }: { currentAdminId: string 
 
       {/* Stats */}
       {stats && (
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 md:gap-4">
           <StatCard label="Total users" value={stats.totalUsers} />
           <StatCard label="New (7 days)" value={stats.newUsers7d} />
           <StatCard label="PRO users" value={stats.proUsers} />
@@ -236,7 +236,7 @@ export default function AdminPanel({ currentAdminId }: { currentAdminId: string 
       )}
 
       {tab === "users" ? (
-        <div className="bg-[#F0F2F0] rounded-[40px] p-6 md:p-8 shadow-inner">
+        <div className="bg-[#F0F2F0] rounded-3xl md:rounded-[40px] p-4 md:p-8 shadow-inner">
           {/* Search + filter */}
           <div className="flex flex-col md:flex-row gap-3 mb-5">
             <input
@@ -269,9 +269,9 @@ export default function AdminPanel({ currentAdminId }: { currentAdminId: string 
                 <tr className="text-gray-500 font-bold">
                   <th className="px-3 py-2">User</th>
                   <th className="px-3 py-2">Plan</th>
-                  <th className="px-3 py-2">Chats</th>
-                  <th className="px-3 py-2">Saved</th>
-                  <th className="px-3 py-2">Joined</th>
+                  <th className="hidden md:table-cell px-3 py-2">Chats</th>
+                  <th className="hidden md:table-cell px-3 py-2">Saved</th>
+                  <th className="hidden md:table-cell px-3 py-2">Joined</th>
                   <th className="px-3 py-2">Status</th>
                 </tr>
               </thead>
@@ -293,7 +293,7 @@ export default function AdminPanel({ currentAdminId }: { currentAdminId: string 
                     <tr
                       key={u.id}
                       onClick={() => openUser(u.id)}
-                      className="cursor-pointer border-t border-gray-200 bg-white/0 transition-colors hover:bg-white"
+                      className="cursor-pointer border-t border-gray-200 bg-white/0 transition-colors [@media(hover:hover)]:hover:bg-white active:bg-white"
                     >
                       <td className="px-3 py-3">
                         <div className="flex items-center gap-3">
@@ -312,9 +312,9 @@ export default function AdminPanel({ currentAdminId }: { currentAdminId: string 
                       <td className="px-3 py-3">
                         <PlanBadge user={u} />
                       </td>
-                      <td className="px-3 py-3 font-semibold text-black">{u.chatsStarted}</td>
-                      <td className="px-3 py-3 font-semibold text-black">{u.applicationsCount}</td>
-                      <td className="px-3 py-3 text-gray-600">{fmtDate(u.createdAt)}</td>
+                      <td className="hidden md:table-cell px-3 py-3 font-semibold text-black">{u.chatsStarted}</td>
+                      <td className="hidden md:table-cell px-3 py-3 font-semibold text-black">{u.applicationsCount}</td>
+                      <td className="hidden md:table-cell px-3 py-3 text-gray-600">{fmtDate(u.createdAt)}</td>
                       <td className="px-3 py-3">
                         {u.suspended ? (
                           <span className="rounded-full bg-red-100 px-3 py-1 text-xs font-bold text-red-700">Suspended</span>
@@ -354,8 +354,8 @@ export default function AdminPanel({ currentAdminId }: { currentAdminId: string 
           </div>
         </div>
       ) : (
-        <div className="bg-[#F0F2F0] rounded-[40px] p-6 md:p-8 shadow-inner">
-          <h2 className="text-2xl font-bold text-black mb-4 px-2">Recent admin activity</h2>
+        <div className="bg-[#F0F2F0] rounded-3xl md:rounded-[40px] p-4 md:p-8 shadow-inner">
+          <h2 className="text-xl md:text-2xl font-bold text-black mb-4 px-2">Recent admin activity</h2>
           {logs.length === 0 ? (
             <p className="px-2 py-8 text-center font-medium text-gray-500">No admin actions yet.</p>
           ) : (
@@ -386,7 +386,7 @@ export default function AdminPanel({ currentAdminId }: { currentAdminId: string 
           onClick={() => setSelected(null)}
         >
           <div
-            className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-[32px] bg-white p-8 shadow-2xl"
+            className="max-h-[90dvh] w-full max-w-2xl overflow-y-auto overscroll-contain rounded-3xl md:rounded-[32px] bg-white p-5 md:p-8 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-start justify-between gap-4">
@@ -402,7 +402,7 @@ export default function AdminPanel({ currentAdminId }: { currentAdminId: string 
               </button>
             </div>
 
-            <div className="mt-6 grid grid-cols-2 gap-3 text-sm">
+            <div className="mt-6 grid grid-cols-1 min-[420px]:grid-cols-2 gap-3 text-sm">
               <div className="rounded-2xl bg-[#F0F2F0] p-4">
                 <p className="text-gray-500 font-semibold">Plan</p>
                 <p className="mt-1 flex items-center gap-2 font-bold text-black">

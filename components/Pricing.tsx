@@ -3,6 +3,8 @@
 // components/Pricing.tsx
 import { useState } from "react";
 import { signIn, useSession } from "next-auth/react";
+import { motion } from "framer-motion";
+import Reveal from "./Reveal";
 
 // Must match PAYHERE_PLAN_AMOUNT / PAYHERE_PLAN_CURRENCY on the server
 const PRICE_LABEL = process.env.NEXT_PUBLIC_PLAN_PRICE_LABEL ?? "LKR 3,000";
@@ -51,19 +53,20 @@ export default function Pricing() {
   };
 
   return (
-    <section id="pricing" className="mt-32 flex flex-col items-center w-full px-4 mb-20">
-      <div className="text-center max-w-xl">
+    <section id="pricing" className="mt-20 md:mt-32 flex flex-col items-center w-full px-4 mb-20">
+      <Reveal className="text-center max-w-xl">
         <h3 className="text-4xl md:text-5xl font-black text-black dark:text-white tracking-tight">
           Plans & Pricing
         </h3>
         <p className="text-gray-500 dark:text-gray-400 font-medium mt-3 text-sm md:text-base">
           Save Your Money & Time
         </p>
-      </div>
+      </Reveal>
 
-      <div className="flex flex-col md:flex-row items-stretch justify-center gap-8 mt-12 w-full max-w-4xl">
+      <div className="flex flex-col md:flex-row items-stretch justify-center gap-6 md:gap-8 mt-8 md:mt-12 w-full max-w-4xl">
         {/* Free Plan */}
-        <div className="w-full max-w-[320px] bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl p-8 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow">
+        <Reveal className="w-full max-w-[320px] flex self-center md:self-auto">
+        <div className="w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl p-8 flex flex-col justify-between shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
           <div>
             <div className="text-center">
               <h4 className="text-brand-primary dark:text-white font-bold text-xl">Free</h4>
@@ -89,9 +92,11 @@ export default function Pricing() {
             Current Plan
           </button>
         </div>
+        </Reveal>
 
         {/* Full House Plan */}
-        <div className="w-full max-w-[320px] bg-brand-primary/5 dark:bg-gray-900/90 border-2 border-brand-primary rounded-3xl p-8 flex flex-col justify-between shadow-xl relative overflow-hidden transform md:-translate-y-2">
+        <Reveal className="w-full max-w-[320px] flex self-center md:self-auto" delay={0.15}>
+        <div className="w-full bg-brand-primary/5 dark:bg-gray-900/90 border-2 border-brand-primary rounded-3xl p-8 flex flex-col justify-between shadow-xl hover:shadow-2xl relative overflow-hidden transform md:-translate-y-2 md:hover:-translate-y-3 transition-all duration-300">
           <div className="absolute top-0 left-0 w-full bg-brand-primary text-white text-[10px] font-black uppercase tracking-widest py-1.5 text-center">
             Most Popular
           </div>
@@ -129,13 +134,16 @@ export default function Pricing() {
           </div>
 
           <div className="mt-8">
-            <button
+            <motion.button
+              whileHover={loading ? undefined : { scale: 1.03 }}
+              whileTap={loading ? undefined : { scale: 0.97 }}
+              transition={{ type: "spring", stiffness: 400, damping: 25 }}
               onClick={handleUpgrade}
               disabled={loading}
-              className="bg-brand-primary hover:bg-brand-primary/90 disabled:opacity-60 disabled:cursor-not-allowed text-white w-full py-3 rounded-full text-sm font-bold shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer"
+              className="bg-brand-primary hover:bg-brand-primary/90 disabled:opacity-60 disabled:cursor-not-allowed text-white w-full py-3 rounded-full text-sm font-bold shadow-md hover:shadow-lg transition-colors duration-200 cursor-pointer"
             >
               {loading ? "Redirecting to PayHere..." : "Get Advanced"}
-            </button>
+            </motion.button>
             {error && (
               <p className="mt-3 text-xs text-red-600 dark:text-red-400 text-center font-medium">
                 {error}
@@ -143,6 +151,7 @@ export default function Pricing() {
             )}
           </div>
         </div>
+        </Reveal>
       </div>
     </section>
   );

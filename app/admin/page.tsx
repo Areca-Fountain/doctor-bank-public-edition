@@ -11,7 +11,7 @@ export default async function AdminPage() {
   if (!admin) redirect("/");
 
   return (
-    <div className="min-h-screen bg-white flex flex-col items-center pt-28 pb-12 px-6">
+    <div className="min-h-dvh bg-white flex flex-col items-center pt-24 md:pt-28 pb-12 px-3 sm:px-6">
       <TopNav view="dashboard" />
       <AdminPanel currentAdminId={admin.id} />
     </div>
