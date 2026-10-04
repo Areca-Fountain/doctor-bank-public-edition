@@ -24,15 +24,17 @@ export default function Hero() {
     >
       
       {/* Main titles */}
-      <motion.h1 variants={item} className="text-4xl min-[400px]:text-5xl sm:text-6xl md:text-8xl font-black tracking-tight text-brand-primary dark:text-white mb-2">
+      <motion.h1 
+        variants={item} 
+        className="text-4xl min-[400px]:text-5xl sm:text-6xl md:text-8xl font-black tracking-tight text-brand-primary dark:text-white mb-2"
+      >
         Simplified Banking
- Issues
-      </h1>
-      <h2 className="text-6xl md:text-8xl font-black tracking-tight text-gray-400/80 mb-12">
-
       </motion.h1>
-      <motion.h2 variants={item} className="text-4xl min-[400px]:text-5xl sm:text-6xl md:text-8xl font-black tracking-tight text-gray-400/50 mb-8 md:mb-12">
- main
+
+      <motion.h2 
+        variants={item} 
+        className="text-4xl min-[400px]:text-5xl sm:text-6xl md:text-8xl font-black tracking-tight text-gray-400/80 mb-8 md:mb-12"
+      >
         AI Assistant
       </motion.h2>
 
@@ -66,15 +68,15 @@ export default function Hero() {
 
       {/* Connected CTA Link */}
       <motion.div variants={item} className="mt-6 md:mt-14 w-full flex justify-center">
-      <Link 
-        href="/chat" 
-        className="flex items-center gap-3 sm:gap-4 bg-white dark:bg-black shadow-xl border border-gray-100 dark:border-white/10 rounded-full pl-5 sm:pl-6 pr-2 py-2 text-base sm:text-lg font-bold text-brand-primary dark:text-white [@media(hover:hover)]:hover:scale-105 [@media(hover:hover)]:hover:shadow-2xl active:scale-95 transition-all duration-200 touch-target"
-      >
-        Chat with Doctor Bank
-        <span className="bg-brand-primary dark:bg-white text-white dark:text-brand-primary px-6 py-2 rounded-full text-sm font-semibold transition-colors">
-          Start
-        </span>
-      </Link>
+        <Link 
+          href="/chat" 
+          className="flex items-center gap-3 sm:gap-4 bg-white dark:bg-black shadow-xl border border-gray-100 dark:border-white/10 rounded-full pl-5 sm:pl-6 pr-2 py-2 text-base sm:text-lg font-bold text-brand-primary dark:text-white [@media(hover:hover)]:hover:scale-105 [@media(hover:hover)]:hover:shadow-2xl active:scale-95 transition-all duration-200 touch-target"
+        >
+          Chat with Doctor Bank
+          <span className="bg-brand-primary dark:bg-white text-white dark:text-brand-primary px-6 py-2 rounded-full text-sm font-semibold transition-colors">
+            Start
+          </span>
+        </Link>
       </motion.div>
 
     </motion.div>
