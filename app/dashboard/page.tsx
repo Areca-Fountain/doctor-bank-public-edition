@@ -67,7 +67,7 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-dvh bg-white flex flex-col items-center pt-24 md:pt-28 px-3 sm:px-6 md:px-8 pb-6">
+    <div className="min-h-dvh flex flex-col items-center pt-24 md:pt-28 px-3 sm:px-6 md:px-8 pb-6">
       
       {/* 2. Replace hardcoded navbar with TopNav */}
       <TopNav view="dashboard" />
@@ -79,14 +79,14 @@ export default function DashboardPage() {
           initial={{ opacity: 0, x: -40 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          className="w-full lg:w-1/3 flex flex-col gap-6 lg:pt-4"
+          className="w-full lg:w-1/3 flex flex-col gap-6"
         >
-          <div className="bg-[#D9D9D9] rounded-3xl md:rounded-[40px] p-6 md:p-10 lg:h-full flex flex-col shadow-sm relative overflow-hidden">
-             <h1 className="text-3xl md:text-4xl font-black text-black mb-3 md:mb-4">
+          <div className="bg-black dark:bg-[#D9D9D9] rounded-3xl md:rounded-[40px] p-6 md:p-10 lg:h-full flex flex-col shadow-sm relative overflow-hidden">
+             <h1 className="text-3xl md:text-4xl font-black text-white dark:text-black mb-3 md:mb-4">
                {session?.user?.name ? `${session.user.name.split(' ')[0]}'s` : "Your"}<br/>
                Dashboard
              </h1>
-             <p className="text-gray-600 font-medium text-base md:text-lg leading-relaxed">
+             <p className="text-gray-300 dark:text-gray-600 font-medium text-base md:text-lg leading-relaxed">
                Welcome back! Here you can view, manage, and continue all of your previous banking application sessions.
              </p>
 
@@ -101,10 +101,10 @@ export default function DashboardPage() {
           initial={{ opacity: 0, x: 40 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-          className="w-full lg:w-2/3 min-w-0 bg-[#F0F2F0] rounded-3xl md:rounded-[40px] p-4 md:p-8 flex flex-col shadow-inner relative min-h-[60dvh] lg:min-h-0"
+          className="w-full lg:w-2/3 min-w-0 bg-black dark:bg-[#F0F2F0] rounded-3xl md:rounded-[40px] p-4 md:p-8 flex flex-col shadow-inner relative min-h-[60dvh] lg:min-h-0"
         >
           <div className="flex justify-between items-center mb-6 px-2">
-            <h2 className="text-xl md:text-2xl font-bold text-black">Saved Chats</h2>
+            <h2 className="text-xl md:text-2xl font-bold text-white dark:text-black">Saved Chats</h2>
             <button 
               onClick={handleDeleteAll}
               disabled={chats.length === 0}
