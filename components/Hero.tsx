@@ -26,8 +26,13 @@ export default function Hero() {
       {/* Main titles */}
       <motion.h1 variants={item} className="text-4xl min-[400px]:text-5xl sm:text-6xl md:text-8xl font-black tracking-tight text-brand-primary dark:text-white mb-2">
         Simplified Banking
+ Issues
+      </h1>
+      <h2 className="text-6xl md:text-8xl font-black tracking-tight text-gray-400/80 mb-12">
+
       </motion.h1>
       <motion.h2 variants={item} className="text-4xl min-[400px]:text-5xl sm:text-6xl md:text-8xl font-black tracking-tight text-gray-400/50 mb-8 md:mb-12">
+ main
         AI Assistant
       </motion.h2>
 
