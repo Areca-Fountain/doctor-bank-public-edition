@@ -30,6 +30,8 @@ function ChatMainLogic() {
   const [isLoading, setIsLoading] = useState(false);
   const [limitReached, setLimitReached] = useState(false);
   const [usageTick, setUsageTick] = useState(0); // bump to reload the counter
+  const [models, setModels] = useState<{ id: string; label: string }[]>([]);
+  const [selectedModel, setSelectedModel] = useState("gemini");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const messageInputRef = useRef<HTMLInputElement>(null);
@@ -74,6 +76,30 @@ function ChatMainLogic() {
     }
   }, [urlChatId]);
 
+  // Load the AI models that are configured on the server, and remember the user's last pick
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch("/api/models");
+        if (!res.ok) return;
+        const data = await res.json();
+        const list: { id: string; label: string }[] = Array.isArray(data.models) ? data.models : [];
+        setModels(list);
+        let saved: string | null = null;
+        try { saved = localStorage.getItem("doctorbank.model"); } catch { /* storage blocked */ }
+        if (saved && list.some((m) => m.id === saved)) setSelectedModel(saved);
+        else if (list.length > 0) setSelectedModel(list[0].id);
+      } catch (error) {
+        console.error("Failed to load AI models:", error);
+      }
+    })();
+  }, []);
+
+  const handleModelChange = (id: string) => {
+    setSelectedModel(id);
+    try { localStorage.setItem("doctorbank.model", id); } catch { /* storage blocked */ }
+  };
+
   // Lock the input when the Free allowance is used up (the server enforces this too)
   const handleUsage = (u: Usage) => {
     if (u.plan === "PRO") {
@@ -117,6 +143,7 @@ function ChatMainLogic() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           applicationId: chatId, // Pass the current ID to the backend
+          model: selectedModel, // Which AI answers this message
           message: newUserMessage.text,
           pdfData: pdfBase64,
           history: currentHistory, 
@@ -287,9 +314,23 @@ function ChatMainLogic() {
                 autoComplete="off"
                 aria-label="Message"
                 placeholder={limitReached ? "Free plan limit reached" : "Type Your Message Here"}
-                className="w-full bg-transparent border border-gray-300 rounded-full pl-5 md:pl-6 pr-14 md:pr-16 py-3.5 md:py-4 outline-none focus:border-brand-primary transition-colors text-gray-700 font-medium"
+                className={`w-full bg-transparent border border-gray-300 rounded-full pl-5 md:pl-6 ${models.length > 1 ? "pr-[9.5rem] md:pr-[11rem]" : "pr-14 md:pr-16"} py-3.5 md:py-4 outline-none focus:border-brand-primary transition-colors text-gray-700 font-medium`}
                 disabled={isLoading || limitReached}
               />
+              {models.length > 1 && (
+                <select
+                  aria-label="AI model"
+                  title="Switch AI model"
+                  value={selectedModel}
+                  onChange={(e) => handleModelChange(e.target.value)}
+                  disabled={isLoading}
+                  className="absolute right-14 md:right-16 top-1/2 -translate-y-1/2 h-10 md:h-9 max-w-[6rem] md:max-w-[7rem] truncate rounded-full border border-gray-300 bg-white px-3 text-xs md:text-sm font-semibold text-gray-700 outline-none cursor-pointer focus:border-brand-primary disabled:opacity-50"
+                >
+                  {models.map((m) => (
+                    <option key={m.id} value={m.id}>{m.label.split(" · ")[0]}</option>
+                  ))}
+                </select>
+              )}
               <button
                 onClick={handleSendMessage}
                 disabled={isLoading || limitReached || !inputText.trim()}

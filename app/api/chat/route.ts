@@ -5,6 +5,10 @@ import { getServerSession } from "next-auth/next";
 import { NextResponse } from "next/server";
 import { authOptions } from "../auth/[...nextauth]/route";
 import { FREE_CHAT_LIMIT, FREE_MESSAGE_LIMIT, isProUser } from "@/lib/plans";
+import { buildFieldMapInstructions, buildSystemPrompt } from "@/lib/systemPrompt";
+import { getModelConfig, isModelId } from "@/lib/aiModels";
+import { AIProviderError, chatCompletion, type ChatMessage } from "@/lib/openaiCompat";
+import { buildFieldMap } from "@/lib/pdfFields";
 
 type ChatHistoryMessage = { role: string; text: string };
 type ExtractedData = Record<string, string | number | boolean | null>;
@@ -35,9 +39,6 @@ const limitResponse = (reason: "FREE_CHAT_LIMIT" | "FREE_MESSAGE_LIMIT") =>
 
 export async function POST(req: Request) {
   try {
-    const geminiApiKey = process.env.GEMINI_API_KEY;
-    if (!geminiApiKey) return NextResponse.json({ text: "Server configuration error." }, { status: 500 });
-
     // Plan limits can only be enforced for logged-in users
     const session = await getServerSession(authOptions);
     const userEmail = session?.user?.email;
@@ -48,7 +49,14 @@ export async function POST(req: Request) {
       history?: ChatHistoryMessage[];
       message?: string;
       pdfData?: string;
+      model?: string;
     };
+
+    // Which AI the user picked in the chat (defaults to Gemini, so old clients keep working)
+    const modelConfig = getModelConfig(isModelId(body.model) ? body.model : "gemini");
+    if (!modelConfig.apiKey) {
+      return NextResponse.json({ text: "That AI model isn't available right now. Please pick another one." }, { status: 400 });
+    }
 
     const applicationId = body.applicationId || null;
     const message = typeof body.message === "string" ? body.message.trim() : "";
@@ -92,53 +100,93 @@ export async function POST(req: Request) {
       : toHistory(body.history).filter((m) => m.role === "model").slice(0, 1);
 
     const pdfBuffer = Buffer.from(pdfData, "base64");
-    const genAI = new GoogleGenerativeAI(geminiApiKey);
 
-    const prompt = `
-      You are Doctor Bank, a strict, literal data-entry AI. You only know the exact text printed on the attached PDF.
+    // Same rules for every model: one shared prompt (see lib/systemPrompt.ts)
+    const prompt = buildSystemPrompt(todayDate);
 
-      Persona and tone:
-      - Friendly, patient, and extremely simple.
+    let responseText: string;
 
-      Modes of operation:
-      The user was just asked to choose: "1. Ask specific questions" or "2. Start an interview".
-      - If they choose 1: Enter Q&A mode. Answer their questions. Do not ask for their name.
-      - If they choose 2: Enter interview mode. Always get the user's name first. Then ask exactly one question per turn to fill out the form.
+    if (modelConfig.kind === "gemini") {
+      // --- GEMINI: reads the PDF file directly (unchanged behaviour) ---
+      const genAI = new GoogleGenerativeAI(modelConfig.apiKey);
+      const model = genAI.getGenerativeModel({
+        model: modelConfig.model,
+        systemInstruction: prompt,
+      });
 
-      Critical system facts:
-      - Date: ${todayDate}. (already filled)
-      - Sensitive data: Never ask for bank account number, NIC, or passport number. Skip them completely.
+      const formattedHistory = history.map((msg) => ({
+        role: msg.role === "user" ? "user" : "model",
+        parts: [{ text: msg.text }],
+      }));
 
-      Conversation rules:
-      - Ask exactly one question per turn.
-      - Numbered options: Always add numbers to options (1, 2, 3...).
-      - Calculations: Multiply monthly income by 12 for annual. Calculate profit margin from income and expenses.
-      - Mid-chat download: If the user asks to download early, reply with PARTIAL_DOWNLOAD followed by JSON.
+      if (formattedHistory.length > 0 && formattedHistory[0].role === "model") {
+        formattedHistory.unshift({ role: "user", parts: [{ text: "Hello! I have uploaded a PDF form. Please analyze it." }] });
+      }
 
-      Exit condition:
-      - As soon as you collect the last required piece of info, immediately generate the final output.
-      - Output FINISHED_INTERVIEW followed by raw JSON. Do not use markdown code fences.
-    `;
+      const chat = model.startChat({ history: formattedHistory });
+      const result = await chat.sendMessage([{ inlineData: { data: pdfData, mimeType: "application/pdf" } }, message]);
+      responseText = result.response.text();
+    } else {
+      // --- MISTRAL: reads the PDF as a document (OCR) + gets a field map so answers land in the right boxes ---
+      try {
+        const fieldMap = await buildFieldMap(pdfBuffer);
 
-    // Set GEMINI_MODEL in .env.local to change the model without editing code
-    const model = genAI.getGenerativeModel({
-      model: process.env.GEMINI_MODEL || "gemini-3.5-flash-lite",
-      systemInstruction: prompt,
-    });
+        const buildMessages = (attachPdf: boolean): ChatMessage[] => {
+          const messages: ChatMessage[] = [
+            { role: "system", content: prompt + buildFieldMapInstructions(fieldMap, attachPdf) },
+          ];
+          if (history.length > 0 && history[0].role !== "user") {
+            messages.push({ role: "user", content: "Hello! I have uploaded a PDF form. Please analyze it." });
+          }
+          for (const msg of history) {
+            messages.push({ role: msg.role === "user" ? "user" : "assistant", content: msg.text });
+          }
+          messages.push({
+            role: "user",
+            content: attachPdf
+              ? [
+                  { type: "text", text: message },
+                  { type: "document_url", document_url: `data:application/pdf;base64,${pdfData}` },
+                ]
+              : message,
+          });
+          return messages;
+        };
 
-    const formattedHistory = history.map((msg) => ({
-      role: msg.role === "user" ? "user" : "model",
-      parts: [{ text: msg.text }],
-    }));
+        const call = (attachPdf: boolean) =>
+          chatCompletion({
+            baseUrl: modelConfig.baseUrl!,
+            apiKey: modelConfig.apiKey!,
+            model: modelConfig.model,
+            messages: buildMessages(attachPdf),
+          });
 
-    if (formattedHistory.length > 0 && formattedHistory[0].role === "model") {
-      formattedHistory.unshift({ role: "user", parts: [{ text: "Hello! I have uploaded a PDF form. Please analyze it." }] });
+        try {
+          responseText = await call(true);
+        } catch (err) {
+          // If Mistral refuses or rate-limits the attached PDF (plan, size or token limits on the free plan),
+          // wait a moment and answer again using the field map alone (far fewer tokens, no document OCR)
+          const retryable = err instanceof AIProviderError && [400, 402, 403, 413, 415, 422, 429].includes(err.status);
+          if (!retryable) throw err;
+          console.error("Mistral rejected the attached PDF, retrying with the field map only:", err);
+          if (err.status === 429) await new Promise((resolve) => setTimeout(resolve, 2200));
+          responseText = await call(false);
+        }
+      } catch (err) {
+        console.error(`${modelConfig.id} error:`, err);
+        const busy = err instanceof AIProviderError && (err.status === 429 || err.status === 413);
+        return NextResponse.json(
+          {
+            text: busy
+              ? "This AI model is busy or has reached its free limit for now. Please switch to another model using the selector above, or try again in a minute."
+              : "This AI model couldn't answer right now. Please switch to another model or try again.",
+            modelBusy: true,
+          },
+          { status: busy ? 429 : 502 }
+        );
+      }
     }
 
-    const chat = model.startChat({ history: formattedHistory });
-    const result = await chat.sendMessage([{ inlineData: { data: pdfData, mimeType: "application/pdf" } }, message]);
-
-    let responseText = result.response.text();
     const isFinished = responseText.includes("FINISHED_INTERVIEW");
     const isPartialDownload = responseText.includes("PARTIAL_DOWNLOAD");
 
