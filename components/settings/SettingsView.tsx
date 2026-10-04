@@ -87,6 +87,7 @@ export default function SettingsView() {
   const [modelMsg, setModelMsg] = useState<{ ok: boolean; text: string } | null>(null);
 
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [cancelOpen, setCancelOpen] = useState(false);
 
   useEffect(() => {
     if (status !== "authenticated") return;
@@ -234,6 +235,15 @@ export default function SettingsView() {
                         <p>
                           Next renewal: <strong className="text-black dark:text-white">{renews}</strong>
                         </p>
+                      )}
+                      {account.paidPlanActive && (
+                        <button
+                          type="button"
+                          onClick={() => setCancelOpen(true)}
+                          className="touch-target mt-3 inline-flex items-center justify-center rounded-full border border-red-300 px-6 py-2.5 text-sm font-semibold text-red-700 transition-colors active:scale-95 dark:border-red-400/40 dark:text-red-300"
+                        >
+                          Cancel subscription
+                        </button>
                       )}
                     </div>
                   ) : (
@@ -409,6 +419,7 @@ export default function SettingsView() {
 
       <AnimatePresence>
         {deleteOpen && account && <DeleteDialog email={account.email} onClose={() => setDeleteOpen(false)} />}
+        {cancelOpen && <CancelSubscriptionDialog renews={renews} onClose={() => setCancelOpen(false)} />}
       </AnimatePresence>
     </div>
   );
@@ -493,6 +504,76 @@ function DeleteDialog({ email, onClose }: { email: string; onClose: () => void }
             className="touch-target inline-flex items-center justify-center rounded-full bg-red-600 px-6 py-2.5 text-sm font-semibold text-white shadow-md transition-transform active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {busy ? "Deleting…" : "Delete forever"}
+          </button>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+function CancelSubscriptionDialog({ renews, onClose }: { renews: string | null; onClose: () => void }) {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && !busy && onClose();
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [busy, onClose]);
+
+  const confirmCancel = async () => {
+    setBusy(true);
+    setError("");
+    try {
+      const res = await fetch("/api/settings/subscription", { method: "DELETE" });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Could not cancel your subscription.");
+      window.location.reload();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not cancel your subscription.");
+      setBusy(false);
+    }
+  };
+
+  return (
+    <motion.div
+      data-lenis-prevent
+      className="fixed inset-0 z-[80] flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      onMouseDown={(e) => e.target === e.currentTarget && !busy && onClose()}
+    >
+      <motion.div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="cancel-sub-title"
+        initial={{ opacity: 0, y: 24, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 24, scale: 0.98 }}
+        transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+        className="w-full max-w-md rounded-3xl border border-gray-100 bg-white p-6 shadow-2xl dark:border-white/10 dark:bg-black sm:p-8"
+      >
+        <h2 id="cancel-sub-title" className="text-xl font-black text-black dark:text-white">
+          Cancel your subscription?
+        </h2>
+        <p className="mt-2 text-sm leading-6 text-gray-600 dark:text-gray-400">
+          You won&apos;t be charged again{renews ? ` after ${renews}` : ""}. Your account will go back to the Free plan and you will
+          lose unlimited chats and priority processing.
+        </p>
+        <p role="alert" className="mt-3 min-h-5 text-sm font-semibold text-red-700 dark:text-red-300">
+          {error}
+        </p>
+        <div className="mt-4 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+          <button onClick={onClose} disabled={busy} className={ghostBtn}>
+            Keep my plan
+          </button>
+          <button
+            onClick={confirmCancel}
+            disabled={busy}
+            className="touch-target inline-flex items-center justify-center rounded-full bg-red-600 px-6 py-2.5 text-sm font-semibold text-white shadow-md transition-transform active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {busy ? "Cancelling…" : "Yes, cancel"}
           </button>
         </div>
       </motion.div>
