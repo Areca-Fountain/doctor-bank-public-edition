@@ -31,7 +31,7 @@ export const topTabs: { label: string; slug: string }[] = [
 /** Groups in the left column */
 export const sidebarGroups: NavGroup[] = [
   { title: "Get started", slugs: ["quickstart", "use", "get-smart-with-work", "document-processor"] },
-  { title: "Foundation", slugs: ["prompting", "plans-selection"] },
+  { title: "Foundation", slugs: ["prompting", "ai-models", "plans-selection"] },
   { title: "Explore", slugs: ["whats-new", "pricing", "doctor-bank-on-the-web", "doctor-bank-on-playstore"] },
 ];
 
@@ -68,7 +68,7 @@ export const pages: AcademyPage[] = [
           },
           {
             title: "Process",
-            text: "The assistant reads your form and asks one question at a time. Your chat is saved after every message so you can come back later. When it has everything, it extracts your answers and maps them to the form fields.",
+            text: "The AI model you picked (Google Gemini or Mistral AI) reads your form and asks one question at a time. Your chat is saved after every message so you can come back later. When it has everything, it extracts your answers and maps them to the form fields.",
           },
           {
             title: "Output",
@@ -93,6 +93,7 @@ export const pages: AcademyPage[] = [
           "Only signed-in users can open chats, the dashboard, and their documents.",
           "You can delete a single chat, or all of your chats, from your dashboard.",
           "Your data is never used for marketing.",
+          "Your choice of AI model is remembered on your device, not shared with anyone.",
           "The assistant never asks for your bank account number, NIC, or passport number.",
         ],
       },
@@ -145,6 +146,11 @@ export const pages: AcademyPage[] = [
         type: "p",
         text: "When the interview is complete, your answers are written into the form's text boxes, checkboxes, and radio buttons. The completed file downloads automatically as `Completed_Bank_Application.pdf`.",
       },
+      { type: "h2", id: "ai-choice", text: "Your choice of AI model" },
+      {
+        type: "p",
+        text: "Doctor Bank works with two AI models: **Google Gemini** and **Mistral AI**. Pick one in Settings, or switch from the dropdown beside the message box in the chat. Both follow the same banking rules. Read more on the [AI models](/academy/ai-models) page.",
+      },
       { type: "h2", id: "guardrails", text: "Banking guardrails" },
       {
         type: "ul",
@@ -152,12 +158,18 @@ export const pages: AcademyPage[] = [
           "The assistant acts as a strict data-entry interviewer and only works from the text printed on your form.",
           "It skips sensitive fields completely: bank account number, NIC, and passport number.",
           "It stays friendly, patient, and simple. No long essays.",
+          "The same instructions apply to every AI model, so switching models never loosens the rules.",
         ],
       },
       { type: "h2", id: "save-resume", text: "Saved sessions" },
       {
         type: "p",
         text: "Every message is saved. Close the tab, come back tomorrow, and continue from your dashboard exactly where you stopped.",
+      },
+      { type: "h2", id: "settings-feature", text: "Settings" },
+      {
+        type: "p",
+        text: "One page for your account: the Google email you are signed in with, your plan and usage, your AI model, security links, and the option to delete your profile.",
       },
       { type: "h2", id: "dashboard", text: "Dashboard" },
       {
@@ -184,6 +196,7 @@ export const pages: AcademyPage[] = [
           ["Output", "Advice you copy by hand", "A filled-in PDF to download"],
           ["Sensitive fields", "May ask for anything", "Skips account, NIC, and passport numbers"],
           ["Progress", "Lost if you close the chat", "Saved and resumable"],
+          ["AI model", "One model, chosen for you", "Choose Google Gemini or Mistral AI"],
         ],
       },
     ],
@@ -207,7 +220,7 @@ export const pages: AcademyPage[] = [
           ["Frontend", "Next.js (React)", "Full-stack web application framework"],
           ["UI styling", "Tailwind CSS", "Responsive layouts and frosted-glass effects"],
           ["Authentication", "NextAuth.js with Google OAuth", "Secure sign-in with a Google account"],
-          ["AI engine", "Google Gemini", "Conversation and structured JSON extraction"],
+          ["AI engines", "Google Gemini and Mistral AI", "Conversation and structured JSON extraction. Users choose between them."],
           ["PDF processing", "pdf-lib", "Reads and fills PDF form fields"],
           ["Database", "PostgreSQL on Neon", "Serverless cloud database"],
           ["ORM", "Prisma", "Backend-to-database layer"],
@@ -224,6 +237,7 @@ export const pages: AcademyPage[] = [
           "A PostgreSQL database. A free Neon database works for development.",
           "A Google Cloud OAuth client for sign-in.",
           "A Google Gemini API key.",
+          "A Mistral API key, if you want the Mistral AI model (optional).",
         ],
       },
       { type: "h2", id: "setup", text: "Set up your copy" },
@@ -258,8 +272,10 @@ export const pages: AcademyPage[] = [
           ["`NEXTAUTH_SECRET`", "Yes", "Secret used to sign sessions."],
           ["`GOOGLE_CLIENT_ID`", "Yes", "Google OAuth client ID."],
           ["`GOOGLE_CLIENT_SECRET`", "Yes", "Google OAuth client secret."],
-          ["`GEMINI_API_KEY`", "Yes", "Key for the Gemini API. Without it the chat returns a server configuration error."],
-          ["`GEMINI_MODEL`", "No", "Chooses the Gemini model without changing code."],
+          ["`GEMINI_API_KEY`", "At least one AI key", "Key for the Gemini API. Without it, Gemini isn't offered to users."],
+          ["`GEMINI_MODEL`", "No", "Which Gemini model to use. Defaults to `gemini-3.5-flash-lite`."],
+          ["`MISTRAL_API_KEY`", "At least one AI key", "Key for the Mistral API. Without it, Mistral AI isn't offered to users."],
+          ["`MISTRAL_MODEL`", "No", "Which Mistral model to use. Defaults to `ministral-14b-2512`."],
           ["`ADMIN_EMAILS`", "No", "Emails allowed to open the admin panel."],
           ["`PAYHERE_MERCHANT_ID`", "For billing", "PayHere merchant ID."],
           ["`PAYHERE_MERCHANT_SECRET`", "For billing", "PayHere merchant secret."],
@@ -274,7 +290,23 @@ export const pages: AcademyPage[] = [
         type: "callout",
         tone: "warning",
         title: "Keep secrets out of Git",
-        text: "Never commit `.env.local`. Keys for Gemini, Google, PayHere, and your database give full access to those services.",
+        text: "Never commit `.env.local`. Keys for Gemini, Mistral, Google, PayHere, and your database give full access to those services.",
+      },
+      { type: "h2", id: "ai-providers", text: "AI models and providers" },
+      {
+        type: "p",
+        text: "A model appears for users only when its API key exists. Add `MISTRAL_API_KEY` and restart, and Mistral AI shows up in Settings and in the chat dropdown. Remove the key and it disappears. Keys are never sent to the browser.",
+      },
+      {
+        type: "table",
+        head: ["File", "What it does"],
+        rows: [
+          ["`lib/aiModels.ts`", "The list of models: names, descriptions, default model names, and which API key each needs."],
+          ["`lib/openaiCompat.ts`", "A small client for OpenAI-style chat APIs, used for Mistral. No extra package is needed."],
+          ["`lib/systemPrompt.ts`", "The one set of banking rules shared by every model, plus the extra form-field instructions Mistral receives."],
+          ["`app/api/models/route.ts`", "Tells the chat page which models are switched on."],
+          ["`app/api/settings/model/route.ts`", "Tells the Settings page about every model and whether it is switched on."],
+        ],
       },
       { type: "h2", id: "google-oauth", text: "Google sign-in" },
       {
@@ -284,7 +316,7 @@ export const pages: AcademyPage[] = [
       { type: "h2", id: "protected-routes", text: "Protected areas" },
       {
         type: "p",
-        text: "These routes require sign-in: `/chat`, `/dashboard`, and `/admin`. The landing page, login page, and this Academy are public.",
+        text: "These routes require sign-in: `/chat`, `/dashboard`, `/settings`, and `/admin`. The landing page, login page, and this Academy are public.",
       },
       { type: "h2", id: "limits", text: "Plan limits" },
       {
@@ -343,6 +375,12 @@ export const pages: AcademyPage[] = [
         tone: "tip",
         title: "Use a fillable PDF",
         text: "Doctor Bank writes your answers into the form's own fields. A fillable PDF (one where you can click into boxes) gets filled automatically. A flat scan has no boxes to fill, so ask your bank for the fillable version.",
+      },
+      {
+        type: "callout",
+        tone: "tip",
+        title: "Choose your AI model",
+        text: "If you see a model dropdown beside the message box, you can switch between Google Gemini and Mistral AI at any time. See [AI models](/academy/ai-models).",
       },
       {
         type: "callout",
@@ -413,6 +451,30 @@ export const pages: AcademyPage[] = [
         items: [
           "Select the bin icon next to a chat to delete that chat.",
           "Select **Delete All** to remove every saved chat. This can't be undone.",
+        ],
+      },
+      { type: "h2", id: "switch-model", text: "Switch AI model" },
+      {
+        type: "ul",
+        items: [
+          "In the chat, use the dropdown beside the message box. It appears when more than one model is available.",
+          "Or open **Settings** from your dashboard and choose a model under **AI model**. The chat uses it from then on.",
+          "You can switch between messages. The conversation carries on with the new model.",
+        ],
+      },
+      { type: "h2", id: "settings", text: "Your settings" },
+      {
+        type: "p",
+        text: "Select **Go to Settings** at the top of your dashboard. There you will find:",
+      },
+      {
+        type: "ul",
+        items: [
+          "**Signed in as** (right side): your Google email, plan, and sign-out button.",
+          "**Subscription**: Free or Full House, status, renewal date, and usage.",
+          "**AI model**: choose Google Gemini or Mistral AI.",
+          "**Password and security**: your password belongs to Google, so this links to your Google account page.",
+          "**Delete profile**: permanently removes your account and everything saved in it.",
         ],
       },
       { type: "h2", id: "usage", text: "Watch your usage" },
@@ -502,12 +564,26 @@ export const pages: AcademyPage[] = [
         type: "steps",
         items: [
           { title: "Upload", text: "Your browser reads the PDF and attaches it to the chat." },
-          { title: "Analyze", text: "The server sends the PDF and the chat to Google Gemini, guided by the Doctor Bank instructions." },
+          { title: "Analyze", text: "The server sends the PDF and the chat to the model you chose, Google Gemini or Mistral AI, guided by the same Doctor Bank instructions." },
           { title: "Save", text: "After every exchange, the chat and PDF are saved to the database so you can resume." },
           { title: "Extract", text: "When the interview ends, the assistant outputs your answers as structured data." },
           { title: "Fill", text: "The server matches each answer to a field in the PDF using the pdf-lib library." },
           { title: "Download", text: "The completed PDF is returned and downloads to your device." },
         ],
+      },
+      { type: "h2", id: "per-model", text: "How each model reads your form" },
+      {
+        type: "table",
+        head: ["", "Google Gemini", "Mistral AI"],
+        rows: [
+          ["Reading the PDF", "Receives the PDF file directly.", "Receives the PDF as a document to read."],
+          ["Finding the boxes", "Matches answers to field names.", "Also gets a map of the form's fillable fields, with the printed label next to each, so answers land in the right box."],
+          ["If the PDF is too big or rate-limited", "Not applicable.", "Doctor Bank waits a moment and tries again using the field map alone."],
+        ],
+      },
+      {
+        type: "p",
+        text: "The field map is built by reading the printed text around each box. Labels are detected automatically, so the assistant skips any box whose label is unclear.",
       },
       { type: "h2", id: "extracted-data", text: "What the extracted data looks like" },
       {
@@ -538,6 +614,7 @@ export const pages: AcademyPage[] = [
           "**Unmatched fields stay empty.** Check the finished file for gaps.",
           "**Sensitive fields are skipped by design.** Account, NIC, and passport numbers are for you to add.",
           "**Today's date** is treated as already known by the assistant.",
+          "**A busy model is not the end.** If a model is busy or has reached its limit, the chat tells you. Switch to the other model or try again in a minute.",
         ],
       },
       {
@@ -562,7 +639,7 @@ export const pages: AcademyPage[] = [
       { type: "h2", id: "rules", text: "The assistant's rules" },
       {
         type: "p",
-        text: "Doctor Bank runs under a fixed system prompt that you cannot change from the chat. It sets the assistant up as a strict data-entry interviewer.",
+        text: "Doctor Bank runs under a fixed system prompt that you cannot change from the chat. It sets the assistant up as a strict data-entry interviewer. The same prompt is used for every AI model, so the rules never differ between Google Gemini and Mistral AI.",
       },
       {
         type: "table",
@@ -575,6 +652,7 @@ export const pages: AcademyPage[] = [
           ["Never asks for account, NIC, or passport numbers", "Keeps your most sensitive details out of the chat."],
           ["Calculates annual figures and profit margin", "Saves you from doing sums."],
           ["Finishes the moment the last answer arrives", "Produces your filled PDF without extra steps."],
+          ["Same rules for every model", "Switching between Gemini and Mistral AI never changes the guardrails."],
         ],
       },
       { type: "h2", id: "answers", text: "Writing good answers" },
@@ -609,6 +687,79 @@ export const pages: AcademyPage[] = [
 
   /* ------------------------------------------------------------------ */
   {
+    slug: "ai-models",
+    title: "AI models",
+    description: "Doctor Bank can use Google Gemini or Mistral AI. See how they differ and how to switch.",
+    blocks: [
+      {
+        type: "p",
+        text: "Doctor Bank is not tied to one AI. You can answer your form with **Google Gemini** or **Mistral AI**. Both follow the same banking rules, ask one question at a time, and skip sensitive numbers.",
+      },
+      { type: "h2", id: "compare", text: "Gemini and Mistral side by side" },
+      {
+        type: "table",
+        head: ["", "Google Gemini", "Mistral AI"],
+        rows: [
+          ["Reads your PDF", "Directly, as the PDF file", "As a document, plus a map of the form's fields"],
+          ["Default model", "`gemini-3.5-flash-lite`", "`ministral-14b-2512`"],
+          ["Banking rules", "The shared Doctor Bank instructions", "The shared Doctor Bank instructions"],
+          ["Sensitive fields", "Skipped", "Skipped"],
+          ["Available on", "Free and Full House", "Free and Full House"],
+        ],
+      },
+      {
+        type: "callout",
+        tone: "note",
+        title: "The exact model can change",
+        text: "The model names above are the defaults. Whoever runs Doctor Bank can set a different one, and the name is shown on each card in Settings.",
+      },
+      { type: "h2", id: "switch", text: "How to switch" },
+      {
+        type: "steps",
+        items: [
+          {
+            title: "In the chat",
+            text: "Use the dropdown beside the message box. It shows when more than one model is available.",
+          },
+          {
+            title: "Or in Settings",
+            text: "Open your dashboard, select **Go to Settings**, and choose a model under **AI model**.",
+          },
+          {
+            title: "Keep going",
+            text: "Your next message uses the new model. The conversation and your answers carry over.",
+          },
+        ],
+      },
+      {
+        type: "p",
+        text: "Your choice is remembered on the device and browser you used. On a new device, pick again.",
+      },
+      { type: "h2", id: "unavailable", text: "When a model isn't available" },
+      {
+        type: "p",
+        text: "A model is only offered when it is switched on for the site. In Settings, a model that isn't switched on is greyed out and marked **Not available right now**. You can still use the other one.",
+      },
+      { type: "h2", id: "busy", text: "If a model is busy" },
+      {
+        type: "p",
+        text: "AI providers sometimes limit how many requests they accept. If that happens, the chat says the model is busy. Switch to the other model with the dropdown, or wait a minute and send your message again.",
+      },
+      {
+        type: "callout",
+        tone: "tip",
+        title: "Which one should I use?",
+        text: "Start with the one that is selected by default. If an answer looks off for your form, try the other model. Either way, read the finished PDF before you submit it.",
+      },
+      { type: "h2", id: "for-developers", text: "For developers" },
+      {
+        type: "p",
+        text: "Models are listed in `lib/aiModels.ts` and switched on by their API keys. Setup details are on the [Configuration](/academy/configuration) page.",
+      },
+    ],
+  },
+
+  {
     slug: "plans-selection",
     title: "Plans selection",
     description: "Compare the Free and Full House plans and decide which one fits your form.",
@@ -625,6 +776,7 @@ export const pages: AcademyPage[] = [
           ["Intended for", "Personal use", "Commercial use"],
           ["Chats", "1 in total", "Unlimited"],
           ["Messages per chat", "10", "Unlimited"],
+          ["AI models", "Google Gemini and Mistral AI", "Google Gemini and Mistral AI"],
           ["Quick problem solving", "Yes", "Yes"],
           ["Priority processing", "No", "Yes"],
           ["Price", "Free", "See [Pricing](/academy/pricing)"],
@@ -676,6 +828,26 @@ export const pages: AcademyPage[] = [
         type: "p",
         text: "Doctor Bank grows in stages. Here is what has been added so far.",
       },
+      { type: "h2", id: "mistral", text: "Mistral AI model" },
+      {
+        type: "ul",
+        items: [
+          "A second AI model, **Mistral AI**, now sits beside Google Gemini.",
+          "Switch models from the dropdown in the chat, or set your choice in Settings.",
+          "Mistral reads your PDF as a document and uses a map of the form's fields so answers land in the right boxes.",
+          "If a model is busy, the chat tells you and suggests the other one.",
+        ],
+      },
+      { type: "h2", id: "settings-new", text: "Settings page" },
+      {
+        type: "ul",
+        items: [
+          "Your signed-in Google email, shown on the right.",
+          "Subscription status and usage in one place.",
+          "AI model choice.",
+          "Password and security links, and a safe way to delete your profile.",
+        ],
+      },
       { type: "h2", id: "academy", text: "Doctor Bank Academy" },
       {
         type: "ul",
@@ -709,7 +881,7 @@ export const pages: AcademyPage[] = [
         items: [
           "Google sign-in with NextAuth.js.",
           "PDF processing with pdf-lib: text boxes, checkboxes, and radio buttons.",
-          "Gemini-powered guided interview with banking guardrails.",
+          "Guided interview with banking guardrails, powered by Google Gemini or Mistral AI.",
           "Chat sessions saved to PostgreSQL with Prisma, so you can resume any time.",
           "A dashboard to continue or delete your chats.",
         ],
@@ -791,6 +963,7 @@ export const pages: AcademyPage[] = [
           ["Academy", "These guides."],
           ["Chat", "Upload a PDF and talk to the assistant. Sign-in required."],
           ["Dashboard", "Saved chats, usage, and delete options. Sign-in required."],
+          ["Settings", "Account, subscription, AI model, security, and delete profile. Sign-in required."],
           ["Light and dark mode", "The toggle sits on the right of the page on large screens, or in the menu on phones."],
         ],
       },

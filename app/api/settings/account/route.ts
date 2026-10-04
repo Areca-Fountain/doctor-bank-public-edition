@@ -3,7 +3,6 @@ import { getServerSession } from "next-auth/next";
 import prisma from "@/lib/db";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { FREE_CHAT_LIMIT, FREE_MESSAGE_LIMIT, isProUser } from "@/lib/plans";
-import { MODEL_COOKIE } from "@/lib/ai-models";
 
 const noStore = { "Cache-Control": "no-store" };
 
@@ -73,9 +72,7 @@ export async function DELETE(req: Request) {
 
     await prisma.user.delete({ where: { id: user.id } });
 
-    const res = NextResponse.json({ success: true });
-    res.cookies.delete(MODEL_COOKIE);
-    return res;
+    return NextResponse.json({ success: true });
   } catch (error) {
     console.error("DELETE settings/account error:", error);
     return NextResponse.json({ error: "Could not delete your profile. Please try again." }, { status: 500 });

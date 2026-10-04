@@ -6,6 +6,8 @@ export type ModelId = "gemini" | "mistral";
 
 export type ModelConfig = {
   id: ModelId;
+  name: string; // provider name shown in Settings
+  description: string; // one-line explanation shown in Settings
   label: string;
   kind: "gemini" | "mistral";
   apiKey: string | undefined;
@@ -23,6 +25,9 @@ export function getModelConfig(id: ModelId): ModelConfig {
     const model = process.env.MISTRAL_MODEL || "ministral-14b-2512";
     return {
       id,
+      name: "Mistral AI",
+      description:
+        "Reads your PDF as a document and uses a map of the form's fields, so your answers land in the right boxes.",
       label: `Mistral · ${model}`,
       kind: "mistral",
       apiKey: process.env.MISTRAL_API_KEY,
@@ -32,6 +37,8 @@ export function getModelConfig(id: ModelId): ModelConfig {
   }
   return {
     id: "gemini",
+    name: "Google Gemini",
+    description: "Reads your PDF file directly, so it sees the form exactly as it is printed.",
     label: "Gemini",
     kind: "gemini",
     apiKey: process.env.GEMINI_API_KEY,
@@ -44,4 +51,15 @@ export function availableModels(): { id: ModelId; label: string }[] {
   return IDS.map(getModelConfig)
     .filter((m) => !!m.apiKey)
     .map(({ id, label }) => ({ id, label }));
+}
+
+// What the Settings page shows: every model, and whether it is switched on (never includes keys)
+export function allModels(): { id: ModelId; name: string; model: string; description: string; available: boolean }[] {
+  return IDS.map(getModelConfig).map(({ id, name, model, description, apiKey }) => ({
+    id,
+    name,
+    model,
+    description,
+    available: !!apiKey,
+  }));
 }

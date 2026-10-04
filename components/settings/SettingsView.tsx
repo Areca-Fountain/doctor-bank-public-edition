@@ -6,7 +6,6 @@ import { signOut, useSession } from "next-auth/react";
 import { AnimatePresence, motion, type Variants } from "framer-motion";
 import TopNav from "@/components/TopNav";
 import SmoothScroll from "@/components/SmoothScroll";
-import { MODEL_OPTIONS } from "@/lib/ai-models";
 
 type Account = {
   name: string | null;
@@ -22,6 +21,11 @@ type Account = {
   messagesLimit: number;
   savedChats: number;
 };
+
+type ModelInfo = { id: string; name: string; model: string; description: string; available: boolean };
+
+// The chat page keeps the user's pick under this same key, so Settings and the chat dropdown stay in sync
+const MODEL_KEY = "doctorbank.model";
 
 // Same stagger, rise and easing as the home-page hero
 const container: Variants = { hidden: {}, show: { transition: { staggerChildren: 0.12, delayChildren: 0.05 } } };
@@ -77,9 +81,10 @@ export default function SettingsView() {
   const [account, setAccount] = useState<Account | null>(null);
   const [loadError, setLoadError] = useState("");
 
-  const [model, setModel] = useState<string>("default");
+  const [models, setModels] = useState<ModelInfo[]>([]);
+  const [modelsLoaded, setModelsLoaded] = useState(false);
+  const [model, setModel] = useState<string>("");
   const [modelMsg, setModelMsg] = useState<{ ok: boolean; text: string } | null>(null);
-  const [savingModel, setSavingModel] = useState(false);
 
   const [deleteOpen, setDeleteOpen] = useState(false);
 
@@ -90,10 +95,21 @@ export default function SettingsView() {
       .then(async ([a, m]) => {
         if (!a.ok) throw new Error();
         const acc = (await a.json()) as Account;
-        const selected = m.ok ? ((await m.json()).selected as string) : "default";
+        const list = m.ok ? (((await m.json()).models as ModelInfo[]) ?? []) : [];
+        const usable = list.filter((x) => x.available);
+        let saved: string | null = null;
+        try {
+          saved = localStorage.getItem(MODEL_KEY);
+        } catch {
+          /* storage blocked */
+        }
+        // Same rule as the chat page: the saved pick if it still works, otherwise the first model that is on
+        const selected = usable.find((x) => x.id === saved)?.id ?? usable[0]?.id ?? "";
         if (cancelled) return;
         setAccount(acc);
+        setModels(list);
         setModel(selected);
+        setModelsLoaded(true);
         setLoadError("");
       })
       .catch(() => {
@@ -104,26 +120,15 @@ export default function SettingsView() {
     };
   }, [status]);
 
-  const chooseModel = async (id: string) => {
-    if (id === model || savingModel) return;
-    const previous = model;
-    setModel(id); // show the choice straight away
-    setSavingModel(true);
-    setModelMsg(null);
+  const chooseModel = (id: string) => {
+    const info = models.find((m) => m.id === id);
+    if (!info || !info.available || id === model) return;
+    setModel(id);
     try {
-      const res = await fetch("/api/settings/model", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ model: id }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.error || "Could not save your choice.");
-      setModelMsg({ ok: true, text: "Saved. Your next message will use this model." });
-    } catch (e) {
-      setModel(previous);
-      setModelMsg({ ok: false, text: e instanceof Error ? e.message : "Could not save your choice." });
-    } finally {
-      setSavingModel(false);
+      localStorage.setItem(MODEL_KEY, id);
+      setModelMsg({ ok: true, text: `Saved. ${info.name} will answer your next messages.` });
+    } catch {
+      setModelMsg({ ok: false, text: "Your browser blocked saving this choice, so it will reset when you leave the page." });
     }
   };
 
@@ -274,49 +279,59 @@ export default function SettingsView() {
             {/* AI model */}
             <motion.section variants={rise} id="ai-model" className={card} aria-labelledby="model-h">
               <div id="model-h">
-                <SectionTitle title="AI model">Choose which Gemini model answers your questions and fills your forms.</SectionTitle>
+                <SectionTitle title="AI model">Choose which AI answers your questions and fills in your forms.</SectionTitle>
               </div>
 
-              <div role="radiogroup" aria-label="AI model" className="grid gap-3">
-                {MODEL_OPTIONS.map((opt) => {
-                  const locked = opt.proOnly && !isPro;
-                  const selected = model === opt.id;
-                  return (
-                    <button
-                      key={opt.id}
-                      type="button"
-                      role="radio"
-                      aria-checked={selected}
-                      disabled={locked || !account}
-                      onClick={() => chooseModel(opt.id)}
-                      className={`touch-target flex items-start gap-4 rounded-2xl border p-4 text-left transition-colors disabled:cursor-not-allowed ${
-                        selected
-                          ? "border-brand-primary bg-brand-primary/5 dark:border-white dark:bg-white/10"
-                          : "border-gray-200 dark:border-white/15 " +
-                            (locked ? "opacity-60" : "[@media(hover:hover)]:hover:border-brand-primary dark:[@media(hover:hover)]:hover:border-white/60")
-                      }`}
-                    >
-                      <span
-                        aria-hidden
-                        className={`mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 ${
-                          selected ? "border-brand-primary dark:border-white" : "border-gray-300 dark:border-white/40"
+              {!modelsLoaded ? (
+                <p className="text-sm text-gray-500">Loading models…</p>
+              ) : models.length === 0 ? (
+                <p className="text-sm text-gray-600 dark:text-gray-400">No AI models are available right now. Please try again later.</p>
+              ) : (
+                <div role="radiogroup" aria-label="AI model" className="grid gap-3">
+                  {models.map((opt) => {
+                    const selected = model === opt.id;
+                    return (
+                      <button
+                        key={opt.id}
+                        type="button"
+                        role="radio"
+                        aria-checked={selected}
+                        disabled={!opt.available}
+                        onClick={() => chooseModel(opt.id)}
+                        className={`touch-target flex items-start gap-4 rounded-2xl border p-4 text-left transition-colors disabled:cursor-not-allowed ${
+                          selected
+                            ? "border-brand-primary bg-brand-primary/5 dark:border-white dark:bg-white/10"
+                            : "border-gray-200 dark:border-white/15 " +
+                              (!opt.available ? "opacity-60" : "[@media(hover:hover)]:hover:border-brand-primary dark:[@media(hover:hover)]:hover:border-white/60")
                         }`}
                       >
-                        {selected && <span className="h-2.5 w-2.5 rounded-full bg-brand-primary dark:bg-white" />}
-                      </span>
-                      <span className="min-w-0">
-                        <span className="flex flex-wrap items-center gap-2">
-                          <span className="font-bold text-black dark:text-white">{opt.label}</span>
-                          {locked && (
-                            <span className="rounded-full bg-brand-primary px-2 py-0.5 text-[11px] font-bold text-white">Full House</span>
-                          )}
+                        <span
+                          aria-hidden
+                          className={`mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 ${
+                            selected ? "border-brand-primary dark:border-white" : "border-gray-300 dark:border-white/40"
+                          }`}
+                        >
+                          {selected && <span className="h-2.5 w-2.5 rounded-full bg-brand-primary dark:bg-white" />}
                         </span>
-                        <span className="mt-1 block text-sm leading-6 text-gray-600 dark:text-gray-400">{opt.description}</span>
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
+                        <span className="min-w-0">
+                          <span className="flex flex-wrap items-center gap-2">
+                            <span className="font-bold text-black dark:text-white">{opt.name}</span>
+                            <span className="rounded-full bg-brand-primary/10 px-2 py-0.5 font-mono text-[11px] font-semibold text-brand-primary dark:bg-white/10 dark:text-white">
+                              {opt.model}
+                            </span>
+                            {!opt.available && (
+                              <span className="rounded-full bg-gray-200 px-2 py-0.5 text-[11px] font-bold text-gray-700 dark:bg-white/15 dark:text-gray-200">
+                                Not available right now
+                              </span>
+                            )}
+                          </span>
+                          <span className="mt-1 block text-sm leading-6 text-gray-600 dark:text-gray-400">{opt.description}</span>
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
 
               <p
                 role="status"
@@ -325,8 +340,9 @@ export default function SettingsView() {
               >
                 {modelMsg?.text}
               </p>
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                Your choice is remembered on this browser. Chats you already started keep their history.
+              <p className="mt-1 text-xs leading-5 text-gray-500 dark:text-gray-400">
+                Your choice is remembered on this browser. You can also switch models from the dropdown next to the message box in the
+                chat.
               </p>
             </motion.section>
 
