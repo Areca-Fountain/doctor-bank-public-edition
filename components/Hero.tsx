@@ -11,7 +11,7 @@ export default function Hero() {
       <h1 className="text-6xl md:text-8xl font-black tracking-tight text-brand-primary dark:text-white mb-2">
         Simplified Banking
       </h1>
-      <h2 className="text-6xl md:text-8xl font-black tracking-tight text-gray-400/50 mb-12">
+      <h2 className="text-6xl md:text-8xl font-black tracking-tight text-gray-400/80 mb-12">
         AI Assistant
       </h2>
 
