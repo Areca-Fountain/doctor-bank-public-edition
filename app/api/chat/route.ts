@@ -5,7 +5,8 @@ import { getServerSession } from "next-auth/next";
 import { NextResponse } from "next/server";
 import { authOptions } from "../auth/[...nextauth]/route";
 import { FREE_CHAT_LIMIT, FREE_MESSAGE_LIMIT, isProUser } from "@/lib/plans";
-import { buildFieldMapInstructions, buildSystemPrompt } from "@/lib/systemPrompt";
+import { buildFieldMapInstructions, buildProSystemPrompt, buildSystemPrompt } from "@/lib/systemPrompt";
+import { RATES_LAST_UPDATED, buildRatesContext } from "@/lib/bankRates";
 import { getModelConfig, isModelId } from "@/lib/aiModels";
 import { AIProviderError, chatCompletion, type ChatMessage } from "@/lib/openaiCompat";
 import { buildFieldMap } from "@/lib/pdfFields";
@@ -64,7 +65,6 @@ export async function POST(req: Request) {
     const todayDate = new Date().toLocaleDateString("en-GB");
 
     if (!message) return NextResponse.json({ text: "Please enter a message to continue." }, { status: 400 });
-    if (!pdfData) return NextResponse.json({ text: "Please upload a PDF form first to start the interview!" }, { status: 400 });
 
     const user =
       (await prisma.user.findUnique({ where: { email: userEmail } })) ??
@@ -75,12 +75,17 @@ export async function POST(req: Request) {
       return NextResponse.json({ text: "Your account has been suspended. Please contact support." }, { status: 403 });
     }
 
+    // Free users must upload a PDF. Pro users can chat without one (general banking assistant mode).
+    if (!pdfData && !isPro) {
+      return NextResponse.json({ text: "Please upload a PDF form first to start the interview!" }, { status: 400 });
+    }
+
     // Load the existing chat from the database (never trust the browser for ownership or counts)
-    let application: { id: string; chatHistory: unknown } | null = null;
+    let application: { id: string; chatHistory: unknown; pdfData: string | null } | null = null;
     if (applicationId) {
       application = await prisma.application.findFirst({
         where: { id: applicationId, userId: user.id },
-        select: { id: true, chatHistory: true },
+        select: { id: true, chatHistory: true, pdfData: true },
       });
       if (!application) return NextResponse.json({ text: "Chat not found." }, { status: 404 });
     }
@@ -106,7 +111,52 @@ export async function POST(req: Request) {
 
     let responseText: string;
 
-    if (modelConfig.kind === "gemini") {
+    if (!pdfData) {
+      // --- PRO, NO PDF: normal banking assistant that can read the curated Sri Lankan rates ---
+      const proPrompt = buildProSystemPrompt(todayDate, buildRatesContext(), RATES_LAST_UPDATED);
+      try {
+        if (modelConfig.kind === "gemini") {
+          const genAI = new GoogleGenerativeAI(modelConfig.apiKey);
+          const model = genAI.getGenerativeModel({ model: modelConfig.model, systemInstruction: proPrompt });
+          const formatted = history.map((msg) => ({
+            role: msg.role === "user" ? "user" : "model",
+            parts: [{ text: msg.text }],
+          }));
+          // Gemini history must start with a user turn
+          if (formatted.length > 0 && formatted[0].role === "model") {
+            formatted.unshift({ role: "user", parts: [{ text: "Hello!" }] });
+          }
+          const chat = model.startChat({ history: formatted });
+          responseText = (await chat.sendMessage(message)).response.text();
+        } else {
+          const messages: ChatMessage[] = [{ role: "system", content: proPrompt }];
+          if (history.length > 0 && history[0].role !== "user") messages.push({ role: "user", content: "Hello!" });
+          for (const msg of history) {
+            messages.push({ role: msg.role === "user" ? "user" : "assistant", content: msg.text });
+          }
+          messages.push({ role: "user", content: message });
+          responseText = await chatCompletion({
+            baseUrl: modelConfig.baseUrl!,
+            apiKey: modelConfig.apiKey!,
+            model: modelConfig.model,
+            messages,
+            temperature: 0.4,
+          });
+        }
+      } catch (err) {
+        console.error(`${modelConfig.id} error:`, err);
+        const busy = err instanceof AIProviderError && (err.status === 429 || err.status === 413);
+        return NextResponse.json(
+          {
+            text: busy
+              ? "This AI model is busy or has reached its limit for now. Please switch to another model using the selector above, or try again in a minute."
+              : "This AI model couldn't answer right now. Please switch to another model or try again.",
+            modelBusy: true,
+          },
+          { status: busy ? 429 : 502 }
+        );
+      }
+    } else if (modelConfig.kind === "gemini") {
       // --- GEMINI: reads the PDF file directly (unchanged behaviour) ---
       const genAI = new GoogleGenerativeAI(modelConfig.apiKey);
       const model = genAI.getGenerativeModel({
@@ -243,6 +293,8 @@ export async function POST(req: Request) {
 
     const docName = extractedData["Business Name"]
       ? String(extractedData["Business Name"])
+      : !pdfData
+      ? "AI Banking Chat"
       : (isFinished ? "Completed Bank Application" : "Bank Application - In Progress");
 
     try {
@@ -252,6 +304,8 @@ export async function POST(req: Request) {
           where: { id: application.id },
           data: {
             chatHistory: fullChatHistory,
+            // A Pro chat that started without a PDF keeps the PDF once the user uploads one
+            ...(pdfData && !isFinished && !application.pdfData ? { pdfData, pdfName: "Bank Application - In Progress" } : {}),
             ...(isFinished ? {
               data: extractedData,
               pdfName: docName,
@@ -276,7 +330,7 @@ export async function POST(req: Request) {
               pdfName: docName,
               data: isFinished ? extractedData : {},
               chatHistory: fullChatHistory,
-              pdfData: isFinished ? (filledPdfBase64 || pdfData) : pdfData,
+              pdfData: pdfData ? (isFinished ? (filledPdfBase64 || pdfData) : pdfData) : null,
             },
             select: { id: true },
           });

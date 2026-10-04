@@ -1,0 +1,88 @@
+{
+  "_README": "EDIT THIS FILE DAILY. Replace every value below with the real, current rates, update lastUpdated, then redeploy. All numbers in this file are SAMPLE PLACEHOLDERS, not real rates. Rates are % per year. Use null when a bank does not offer a product or you do not have the figure.",
+  "lastUpdated": "2026-10-04",
+  "currency": "LKR",
+  "banks": [
+    {
+      "name": "Bank of Ceylon",
+      "shortName": "BOC",
+      "personalLoan": { "minRate": 12.5, "maxRate": 16.0, "maxTenureYears": 7, "notes": "SAMPLE" },
+      "housingLoan": { "minRate": 11.5, "maxRate": 14.0, "maxTenureYears": 25, "notes": "SAMPLE" },
+      "vehicleLoan": { "minRate": 13.0, "maxRate": 17.0, "maxTenureYears": 7, "notes": "SAMPLE" },
+      "fixedDeposit12Month": { "rate": 8.5, "notes": "SAMPLE" },
+      "savingsAccount": { "rate": 2.5, "notes": "SAMPLE" }
+    },
+    {
+      "name": "People's Bank",
+      "shortName": "People's",
+      "personalLoan": { "minRate": 12.0, "maxRate": 15.5, "maxTenureYears": 7, "notes": "SAMPLE" },
+      "housingLoan": { "minRate": 11.0, "maxRate": 13.5, "maxTenureYears": 25, "notes": "SAMPLE" },
+      "vehicleLoan": { "minRate": 13.5, "maxRate": 17.5, "maxTenureYears": 7, "notes": "SAMPLE" },
+      "fixedDeposit12Month": { "rate": 8.4, "notes": "SAMPLE" },
+      "savingsAccount": { "rate": 2.5, "notes": "SAMPLE" }
+    },
+    {
+      "name": "Commercial Bank of Ceylon",
+      "shortName": "ComBank",
+      "personalLoan": { "minRate": 13.0, "maxRate": 17.0, "maxTenureYears": 7, "notes": "SAMPLE" },
+      "housingLoan": { "minRate": 11.75, "maxRate": 14.5, "maxTenureYears": 25, "notes": "SAMPLE" },
+      "vehicleLoan": { "minRate": 13.0, "maxRate": 17.0, "maxTenureYears": 7, "notes": "SAMPLE" },
+      "fixedDeposit12Month": { "rate": 8.25, "notes": "SAMPLE" },
+      "savingsAccount": { "rate": 2.75, "notes": "SAMPLE" }
+    },
+    {
+      "name": "Hatton National Bank",
+      "shortName": "HNB",
+      "personalLoan": { "minRate": 13.5, "maxRate": 17.5, "maxTenureYears": 7, "notes": "SAMPLE" },
+      "housingLoan": { "minRate": 12.0, "maxRate": 15.0, "maxTenureYears": 25, "notes": "SAMPLE" },
+      "vehicleLoan": { "minRate": 13.5, "maxRate": 17.5, "maxTenureYears": 7, "notes": "SAMPLE" },
+      "fixedDeposit12Month": { "rate": 8.3, "notes": "SAMPLE" },
+      "savingsAccount": { "rate": 2.5, "notes": "SAMPLE" }
+    },
+    {
+      "name": "Sampath Bank",
+      "shortName": "Sampath",
+      "personalLoan": { "minRate": 13.25, "maxRate": 17.0, "maxTenureYears": 7, "notes": "SAMPLE" },
+      "housingLoan": { "minRate": 12.0, "maxRate": 14.75, "maxTenureYears": 25, "notes": "SAMPLE" },
+      "vehicleLoan": { "minRate": 14.0, "maxRate": 18.0, "maxTenureYears": 7, "notes": "SAMPLE" },
+      "fixedDeposit12Month": { "rate": 8.6, "notes": "SAMPLE" },
+      "savingsAccount": { "rate": 3.0, "notes": "SAMPLE" }
+    },
+    {
+      "name": "Seylan Bank",
+      "shortName": "Seylan",
+      "personalLoan": { "minRate": 14.0, "maxRate": 18.0, "maxTenureYears": 7, "notes": "SAMPLE" },
+      "housingLoan": { "minRate": 12.5, "maxRate": 15.5, "maxTenureYears": 20, "notes": "SAMPLE" },
+      "vehicleLoan": { "minRate": 14.0, "maxRate": 18.0, "maxTenureYears": 7, "notes": "SAMPLE" },
+      "fixedDeposit12Month": { "rate": 8.7, "notes": "SAMPLE" },
+      "savingsAccount": { "rate": 3.0, "notes": "SAMPLE" }
+    },
+    {
+      "name": "National Development Bank",
+      "shortName": "NDB",
+      "personalLoan": { "minRate": 13.75, "maxRate": 17.5, "maxTenureYears": 7, "notes": "SAMPLE" },
+      "housingLoan": { "minRate": 12.25, "maxRate": 15.0, "maxTenureYears": 20, "notes": "SAMPLE" },
+      "vehicleLoan": { "minRate": 14.0, "maxRate": 18.0, "maxTenureYears": 7, "notes": "SAMPLE" },
+      "fixedDeposit12Month": { "rate": 8.8, "notes": "SAMPLE" },
+      "savingsAccount": { "rate": 3.0, "notes": "SAMPLE" }
+    },
+    {
+      "name": "DFCC Bank",
+      "shortName": "DFCC",
+      "personalLoan": { "minRate": 14.0, "maxRate": 18.5, "maxTenureYears": 7, "notes": "SAMPLE" },
+      "housingLoan": { "minRate": 12.5, "maxRate": 15.5, "maxTenureYears": 20, "notes": "SAMPLE" },
+      "vehicleLoan": { "minRate": 14.5, "maxRate": 18.5, "maxTenureYears": 7, "notes": "SAMPLE" },
+      "fixedDeposit12Month": { "rate": 8.75, "notes": "SAMPLE" },
+      "savingsAccount": { "rate": 3.0, "notes": "SAMPLE" }
+    },
+    {
+      "name": "Nations Trust Bank",
+      "shortName": "NTB",
+      "personalLoan": { "minRate": 13.5, "maxRate": 18.0, "maxTenureYears": 7, "notes": "SAMPLE" },
+      "housingLoan": { "minRate": 12.5, "maxRate": 15.0, "maxTenureYears": 20, "notes": "SAMPLE" },
+      "vehicleLoan": { "minRate": 14.0, "maxRate": 18.0, "maxTenureYears": 7, "notes": "SAMPLE" },
+      "fixedDeposit12Month": { "rate": 8.6, "notes": "SAMPLE" },
+      "savingsAccount": { "rate": 3.0, "notes": "SAMPLE" }
+    }
+  ]
+}

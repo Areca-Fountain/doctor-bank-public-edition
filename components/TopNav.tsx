@@ -6,6 +6,7 @@ import { useState, useEffect, type MouseEvent } from "react";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import ThemeToggle from "./ThemeToggle";
+import { usePlan } from "@/lib/usePlan";
 
 interface NavItem {
   name: string;
@@ -42,6 +43,7 @@ const scrollToTarget = (target: HTMLElement | null) => {
 
 export default function TopNav({ view = "home" }: TopNavProps) {
   const { data: session } = useSession();
+  const { isPro } = usePlan();
   const pathname = usePathname();
   // Only admins get an extra "Admin" link (the server decides, see /api/admin/me)
   const [isAdmin, setIsAdmin] = useState(false);
@@ -62,7 +64,9 @@ export default function TopNav({ view = "home" }: TopNavProps) {
     };
   }, [session?.user?.email]);
 
-  const baseNavItems = view === "dashboard" ? dashboardNavItems : homeNavItems;
+  // Pro members have no pricing section, so that tab becomes "Benefits"
+  const proHomeNavItems = homeNavItems.map((i) => (i.name === "Pricing" ? { name: "Benefits", href: "/#benefits" } : i));
+  const baseNavItems = view === "dashboard" ? dashboardNavItems : isPro ? proHomeNavItems : homeNavItems;
   const currentNavItems: NavItem[] = isAdmin ? [...baseNavItems, { name: "Admin", href: "/admin" }] : baseNavItems;
 
   const [activeTab, setActiveTab] = useState(currentNavItems[0]?.name || "Home");
@@ -145,15 +149,26 @@ export default function TopNav({ view = "home" }: TopNavProps) {
     <Link
       href="/dashboard"
       title={session.user.name || "User Profile"}
-      className="block group touch-target"
+      className="block group touch-target relative"
     >
-      <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-300 dark:border-white/80 group-hover:border-brand-primary transition-all shadow-md bg-brand-primary flex items-center justify-center text-white font-bold text-lg">
+      <div
+        className={`w-10 h-10 rounded-full overflow-hidden border-2 transition-all shadow-md bg-brand-primary flex items-center justify-center text-white font-bold text-lg ${
+          isPro
+            ? "border-[#e8b923] shadow-[0_0_12px_rgba(232,185,35,0.7)]"
+            : "border-gray-300 dark:border-white/80 group-hover:border-brand-primary"
+        }`}
+      >
         {session.user.image ? (
           <img src={session.user.image} alt={session.user.name || "User Avatar"} className="w-full h-full object-cover" />
         ) : (
           initial
         )}
       </div>
+      {isPro && (
+        <span className="pro-tag absolute -bottom-1.5 left-1/2 -translate-x-1/2 rounded-full px-1.5 py-px text-[9px] font-black leading-none tracking-wider border border-white/70">
+          PRO
+        </span>
+      )}
     </Link>
   ) : (
     <button

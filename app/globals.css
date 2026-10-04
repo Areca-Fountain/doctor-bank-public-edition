@@ -116,3 +116,130 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* =====================  PRO / GOLD STYLES  ===================== */
+:root {
+  --gold-1: #f7e08a;
+  --gold-2: #e8b923;
+  --gold-3: #b8860b;
+  --gold-4: #8a6508;
+}
+
+/* Gold CTA button with a glowing stroke that travels around the border */
+@property --gold-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+.gold-glow-btn {
+  position: relative;
+  isolation: isolate;
+  background: linear-gradient(135deg, #e8b923 0%, #c9971c 50%, #a97a0e 100%);
+  color: #fff;
+  border-radius: 9999px;
+  box-shadow: 0 8px 24px rgba(201, 151, 28, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+/* the moving stroke */
+.gold-glow-btn::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  padding: 2px;
+  background: conic-gradient(from var(--gold-angle), transparent 0deg, transparent 250deg, #fff6c8 300deg, #ffffff 330deg, transparent 360deg);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  animation: gold-spin 2.6s linear infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+/* soft glow that follows the stroke */
+.gold-glow-btn::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: inherit;
+  background: conic-gradient(from var(--gold-angle), transparent 0deg, transparent 260deg, rgba(255, 224, 120, 0.9) 320deg, transparent 360deg);
+  filter: blur(9px);
+  opacity: 0.7;
+  animation: gold-spin 2.6s linear infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+@keyframes gold-spin {
+  to {
+    --gold-angle: 360deg;
+  }
+}
+
+/* Shiny gold card */
+.gold-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.5rem;
+  color: #2b1d00;
+  background: linear-gradient(135deg, #fff1b8 0%, #f2c94c 28%, #d4a017 55%, #f7e08a 80%, #c9971c 100%);
+  border: 1px solid rgba(255, 244, 190, 0.9);
+  box-shadow: 0 10px 30px rgba(184, 134, 11, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+.gold-card::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -60%;
+  width: 40%;
+  height: 200%;
+  transform: rotate(20deg);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.65), transparent);
+  animation: gold-shine 3.6s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes gold-shine {
+  0% {
+    left: -60%;
+  }
+  60%,
+  100% {
+    left: 140%;
+  }
+}
+
+/* Seamless, endlessly rotating row of cards (content is rendered twice, so -50% loops perfectly) */
+.gold-marquee {
+  display: flex;
+  width: max-content;
+  gap: 1.25rem;
+  animation: gold-marquee 38s linear infinite;
+}
+.gold-marquee-wrap:hover .gold-marquee {
+  animation-play-state: paused;
+}
+@keyframes gold-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-50% - 0.625rem));
+  }
+}
+
+/* Small gold "PRO" tag */
+.pro-tag {
+  background: linear-gradient(135deg, #f7e08a, #d4a017 60%, #a97a0e);
+  color: #3a2800;
+  box-shadow: 0 2px 8px rgba(201, 151, 28, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gold-glow-btn::before,
+  .gold-glow-btn::after,
+  .gold-card::after,
+  .gold-marquee {
+    animation: none !important;
+  }
+  .gold-marquee-wrap {
+    overflow-x: auto;
+  }
+}

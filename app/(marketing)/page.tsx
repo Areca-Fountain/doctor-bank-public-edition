@@ -1,7 +1,7 @@
 import TopNav from "@/components/TopNav";
 import ThemeToggle from "@/components/ThemeToggle";
 import Hero from "@/components/Hero";
-import Pricing from "@/components/Pricing";
+import PlanSection from "@/components/PlanSection";
 import About from "@/components/About";
 import SmoothScroll from "@/components/SmoothScroll";
 import ScrollProgress from "@/components/ScrollProgress";
@@ -14,7 +14,7 @@ export default function LandingPage() {
       <ThemeToggle />
       <TopNav />
       <Hero />
-      <Pricing />
+      <PlanSection />
       <About />
     </main>
   );

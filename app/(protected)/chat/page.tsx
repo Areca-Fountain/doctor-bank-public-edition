@@ -12,6 +12,10 @@ type Message = {
   text: string;
 };
 
+const FREE_GREETING = "What Would You Like to Do?\n\n1. Start an Interview and Fill\n2. Ask a Specified Problem";
+const PRO_GREETING =
+  "Welcome back, Pro member! 🌟\n\nAsk me anything about banking in Sri Lanka, such as loan rates, savings, fixed deposits or how to apply. No PDF needed.\n\nIf you want help filling a bank form, just tap Upload PDF.";
+
 function ChatMainLogic() {
   const searchParams = useSearchParams();
   const urlChatId = searchParams.get("id");
@@ -24,8 +28,9 @@ function ChatMainLogic() {
   const [uploadedFiles, setUploadedFiles] = useState<{ name: string; date: string }[]>([]);
   
   const [messages, setMessages] = useState<Message[]>([
-    { role: "model", text: "What Would You Like to Do?\n\n1. Start an Interview and Fill\n2. Ask a Specified Problem" }
+    { role: "model", text: FREE_GREETING }
   ]);
+  const [isPro, setIsPro] = useState(false);
   const [inputText, setInputText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [limitReached, setLimitReached] = useState(false);
@@ -103,9 +108,13 @@ function ChatMainLogic() {
   // Lock the input when the Free allowance is used up (the server enforces this too)
   const handleUsage = (u: Usage) => {
     if (u.plan === "PRO") {
+      setIsPro(true);
       setLimitReached(false);
+      // Brand new chat: swap the PDF-style greeting for the Pro one
+      setMessages((prev) => (prev.length === 1 && prev[0].text === FREE_GREETING ? [{ role: "model", text: PRO_GREETING }] : prev));
       return;
     }
+    setIsPro(false);
     setLimitReached(chatId ? u.messagesUsed >= u.messagesLimit : u.chatsUsed >= u.chatsLimit);
   };
 
@@ -126,7 +135,8 @@ function ChatMainLogic() {
 
   const handleSendMessage = async () => {
     if (!inputText.trim()) return;
-    if (!pdfBase64) {
+    // Free users need a PDF. Pro users can chat without one.
+    if (!pdfBase64 && !isPro) {
       alert("Please upload a PDF form first to start!");
       return;
     }
@@ -145,7 +155,7 @@ function ChatMainLogic() {
           applicationId: chatId, // Pass the current ID to the backend
           model: selectedModel, // Which AI answers this message
           message: newUserMessage.text,
-          pdfData: pdfBase64,
+          pdfData: pdfBase64 ?? "",
           history: currentHistory, 
         }),
       });
@@ -219,7 +229,7 @@ function ChatMainLogic() {
                   {uploadedFiles.length > 1 && <span className="text-gray-400 text-xs shrink-0">+{uploadedFiles.length - 1}</span>}
                 </span>
               ) : (
-                <span className="text-gray-500 font-medium truncate block">No form uploaded yet</span>
+                <span className="text-gray-500 font-medium truncate block">{isPro ? "PDF optional (Pro)" : "No form uploaded yet"}</span>
               )}
             </div>
           </div>
@@ -228,7 +238,9 @@ function ChatMainLogic() {
           <div className="hidden md:flex w-64 lg:w-80 flex-col gap-6 relative z-10 pt-4 shrink-0">
             <div className="bg-[#D9D9D9] rounded-[30px] p-6 lg:p-8 text-center shadow-sm">
               <p className="text-[11px] text-gray-500 italic mb-8 px-2 font-medium">
-                (*Note : Upload Your Banking Applications, Loan & Financing Documents.)
+                {isPro
+                  ? "(*Pro : Uploading a PDF is optional. Ask any banking question, or upload a form to fill it.)"
+                  : "(*Note : Upload Your Banking Applications, Loan & Financing Documents.)"}
               </p>
               <button
                 onClick={() => fileInputRef.current?.click()}
