@@ -17,7 +17,7 @@ DOCTOR BANK bridges this gap. Instead of forcing users to understand technical b
 
 ## Key Features
 
-- **Google sign-in** via NextAuth.js (Google OAuth)
+- **Google sign-in** with the official Google Identity Services button; the ID token is verified on the server and a NextAuth.js session is created
 - **PDF upload** of blank bank, loan, or financing application forms
 - **Conversational interview** that asks one question at a time
 - **Plain-language explanations** of financial terms
@@ -32,7 +32,7 @@ DOCTOR BANK bridges this gap. Instead of forcing users to understand technical b
 
 Frontend Framework [Next.js](https://nextjs.org) (React) Full-stack web application framework
 UI Styling [Tailwind CSS](https://tailwindcss.com) Responsive UI, frosted glass effects, responsive layouts
-Authentication [NextAuth.js](https://next-auth.js.org) (Google OAuth) Secure user login via Google account
+Authentication [Google Identity Services](https://developers.google.com/identity/gsi/web) + [NextAuth.js](https://next-auth.js.org) Secure user login via Google account (no passwords handled by this app)
 AI Engine [Google Gemini 2.5 Flash](https://ai.google.dev) Conversational AI and structured JSON extraction
 PDF Processing [pdf-lib](https://pdf-lib.js.org) Read and programmatically fill PDF form fields
 Database [PostgreSQL (Neon)](https://neon.tech) Serverless cloud database hosting 
@@ -43,13 +43,26 @@ Backend API Next.js API Routes (Node.js) Serverless functions for API logic Host
 
 Next.js (React) | Frontend and backend framework 
 Tailwind CSS | UI styling 
-NextAuth.js | Authentication (Google OAuth provider) 
+Google Identity Services + NextAuth.js | Authentication (server-verified Google ID token) 
 Google Generative AI SDK (`@google/generative-ai`)
 pdf-lib | PDF reading and form-field manipulation
 Prisma ORM | Database access layer 
 PostgreSQL via Neon | Serverless database hosting 
 Netlify | Hosting and deployment 
 Git / GitHub 
+
+### 2b. Google sign-in setup
+
+In Google Cloud Console, create an **OAuth 2.0 Client ID (Web application)** and add your site (e.g. `http://localhost:3000` and your production URL) under **Authorized JavaScript origins**. Then set:
+
+```bash
+GOOGLE_CLIENT_ID=...apps.googleusercontent.com
+NEXT_PUBLIC_GOOGLE_CLIENT_ID=...apps.googleusercontent.com   # same value, used by the sign-in button
+NEXTAUTH_SECRET=...
+NEXTAUTH_URL=http://localhost:3000
+```
+
+`GOOGLE_CLIENT_SECRET` is no longer needed.
 
 ### 3. Set up the database
 
@@ -81,7 +94,7 @@ npm start
 
 Data privacy is a core design goal of DOCTOR BANK:
 
-- **Authenticated access only** – Google OAuth through NextAuth.js ensures only authorized users reach the platform.
+- **Authenticated access only** – Google Identity Services sign-in (ID token verified server-side) ensures only signed-in users reach the platform.
 - **Delete anywhere** – Users can delete their chats and associated content from the platform.
 - **No marketing use** – User data is never used for marketing purposes.
 - **Sensitive-field avoidance** – The AI is instructed to skip fields such as passwords and full account numbers.

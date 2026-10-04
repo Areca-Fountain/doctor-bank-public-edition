@@ -8,7 +8,8 @@ Sentry.init({
   dsn: "https://45c056a9416ef86c0dd487dfe76298f2@o4511326457364480.ingest.us.sentry.io/4511326461231104",
 
   // Add optional integrations for additional features
-  integrations: [Sentry.replayIntegration()],
+  // Replay records the screen, and this app shows bank-form answers. Mask all text, inputs and media.
+  integrations: [Sentry.replayIntegration({ maskAllText: true, maskAllInputs: true, blockAllMedia: true })],
 
   // Define how likely traces are sampled. Adjust this value in production, or use tracesSampler for greater control.
   tracesSampleRate: 1,
@@ -25,7 +26,7 @@ Sentry.init({
 
   // Enable sending user PII (Personally Identifiable Information)
   // https://docs.sentry.io/platforms/javascript/guides/nextjs/configuration/options/#sendDefaultPii
-  sendDefaultPii: true,
+  sendDefaultPii: false, // people upload bank forms here, so don't attach IPs, cookies or user details
 });
 
 export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;

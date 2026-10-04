@@ -2,7 +2,8 @@
 
 // components/Pricing.tsx
 import { useState } from "react";
-import { signIn, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import Reveal from "./Reveal";
 
@@ -11,6 +12,7 @@ const PRICE_LABEL = process.env.NEXT_PUBLIC_PLAN_PRICE_LABEL ?? "LKR 3,000";
 
 export default function Pricing() {
   const { data: session } = useSession();
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -18,7 +20,7 @@ export default function Pricing() {
     setError(null);
 
     if (!session?.user) {
-      signIn("google");
+      router.push("/login");
       return;
     }
 

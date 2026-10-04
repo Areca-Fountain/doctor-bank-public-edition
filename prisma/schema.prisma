@@ -39,12 +39,12 @@ model User {
   email                 String?       @unique
   emailVerified         DateTime?
   image                 String?
+  chatsStarted          Int           @default(0)
+  createdAt             DateTime      @default(now())
   payhereSubscriptionId String?
   plan                  String        @default("FREE")
   planRenewsAt          DateTime?
   planStatus            String        @default("NONE")
-  chatsStarted          Int           @default(0)
-  createdAt             DateTime      @default(now())
   role                  String        @default("USER")
   suspended             Boolean       @default(false)
   accounts              Account[]

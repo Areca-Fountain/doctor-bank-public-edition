@@ -1,6 +1,6 @@
 "use client";
 
-import { signOut, useSession, signIn } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useState, useEffect, type MouseEvent } from "react";
 import { usePathname } from "next/navigation";
@@ -171,16 +171,16 @@ export default function TopNav({ view = "home" }: TopNavProps) {
       )}
     </Link>
   ) : (
-    <button
-      onClick={() => signIn("google")}
-      title="Sign in with Google"
-      aria-label="Sign in with Google"
+    <Link
+      href="/login"
+      title="Sign in"
+      aria-label="Sign in"
       className="w-10 h-10 rounded-full border-2 border-gray-400 dark:border-white/80 hover:border-brand-primary text-gray-700 dark:text-white hover:bg-brand-primary hover:text-white transition-all duration-200 shadow-sm group flex items-center justify-center touch-target"
     >
       <svg className="w-5 h-5 fill-current group-hover:scale-110 transition-transform" viewBox="0 0 24 24">
         <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
       </svg>
-    </button>
+    </Link>
   );
 
   return (
