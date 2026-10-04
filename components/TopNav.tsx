@@ -25,7 +25,7 @@ const homeNavItems: NavItem[] = [
 
 const dashboardNavItems: NavItem[] = [
   { name: "Home", href: "/" },
-  { name: "Go to Setting", href: "/settings" },
+  { name: "Go to Settings", href: "/settings" },
 ];
 
 // Smoothly scroll to a section (or the top). Uses Lenis when the page has it, else the browser.
