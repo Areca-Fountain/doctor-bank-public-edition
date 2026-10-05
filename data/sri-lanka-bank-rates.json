@@ -6,83 +6,83 @@
     {
       "name": "Bank of Ceylon",
       "shortName": "BOC",
-      "personalLoan": { "minRate": 12.5, "maxRate": 14.0, "maxTenureYears": 7, "notes": "SAMPLE" },
-      "housingLoan": { "minRate": 11.5, "maxRate": 14.0, "maxTenureYears": 25, "notes": "SAMPLE" },
-      "vehicleLoan": { "minRate": 13.0, "maxRate": 17.0, "maxTenureYears": 7, "notes": "SAMPLE" },
-      "fixedDeposit12Month": { "rate": 7.25, "notes": "SAMPLE" },
-      "savingsAccount": { "rate": 2.0, "notes": "SAMPLE" }
+      "personalLoan": { "minRate": 12.5, "maxRate": 14.0, "maxTenureYears": 7, "notes": "T&C apply" },
+      "housingLoan": { "minRate": 11.5, "maxRate": 14.0, "maxTenureYears": 25, "notes": "T&C apply" },
+      "vehicleLoan": { "minRate": 13.0, "maxRate": 17.0, "maxTenureYears": 7, "notes": "T&C apply" },
+      "fixedDeposit12Month": { "rate": 7.25, "notes": "T&C apply" },
+      "savingsAccount": { "rate": 2.0, "notes": "T&C apply" }
     },
     {
       "name": "People's Bank",
       "shortName": "People's",
-      "personalLoan": { "minRate": 13.5, "maxRate": 16.0, "maxTenureYears": 7, "notes": "SAMPLE" },
-      "housingLoan": { "minRate": 13.5, "maxRate": 15.5, "maxTenureYears": 25, "notes": "SAMPLE" },
-      "vehicleLoan": { "minRate": 13.5, "maxRate": 15.0, "maxTenureYears": 8, "notes": "SAMPLE" },
-      "fixedDeposit12Month": { "rate": 8.5, "notes": "SAMPLE" },
-      "savingsAccount": { "rate": 2.5, "notes": "SAMPLE" }
+      "personalLoan": { "minRate": 13.5, "maxRate": 16.0, "maxTenureYears": 7, "notes": "T&C apply" },
+      "housingLoan": { "minRate": 13.5, "maxRate": 15.5, "maxTenureYears": 25, "notes": "T&C apply" },
+      "vehicleLoan": { "minRate": 13.5, "maxRate": 15.0, "maxTenureYears": 8, "notes": "T&C apply" },
+      "fixedDeposit12Month": { "rate": 8.5, "notes": "T&C apply" },
+      "savingsAccount": { "rate": 2.5, "notes": "T&C apply" }
     },
     {
       "name": "Commercial Bank of Ceylon",
       "shortName": "ComBank",
-      "personalLoan": { "minRate": 13.5, "maxRate": 17.0, "maxTenureYears": 7, "notes": "SAMPLE" },
-      "housingLoan": { "minRate": 11.5, "maxRate": 14.0, "maxTenureYears": 20, "notes": "SAMPLE" },
-      "vehicleLoan": { "minRate": 13.5, "maxRate": 15.5, "maxTenureYears": 7, "notes": "SAMPLE" },
-      "fixedDeposit12Month": { "rate": 10.0, "notes": "SAMPLE" },
-      "savingsAccount": { "rate": 2.75, "notes": "SAMPLE" }
+      "personalLoan": { "minRate": 13.5, "maxRate": 17.0, "maxTenureYears": 7, "notes": "T&C apply" },
+      "housingLoan": { "minRate": 11.5, "maxRate": 14.0, "maxTenureYears": 20, "notes": "T&C apply" },
+      "vehicleLoan": { "minRate": 13.5, "maxRate": 15.5, "maxTenureYears": 7, "notes": "T&C apply" },
+      "fixedDeposit12Month": { "rate": 10.0, "notes": "T&C apply" },
+      "savingsAccount": { "rate": 2.75, "notes": "T&C apply" }
     },
     {
       "name": "Hatton National Bank",
       "shortName": "HNB",
-      "personalLoan": { "minRate": 13.5, "maxRate": 17.0, "maxTenureYears": 5, "notes": "SAMPLE" },
-      "housingLoan": { "minRate": 11.5, "maxRate": 16.0, "maxTenureYears": 25, "notes": "SAMPLE" },
-      "vehicleLoan": { "minRate": 13.5, "maxRate": 17.0, "maxTenureYears": 7, "notes": "SAMPLE" },
-      "fixedDeposit12Month": { "rate": 10.0, "notes": "SAMPLE" },
-      "savingsAccount": { "rate": 2.0, "notes": "SAMPLE" }
+      "personalLoan": { "minRate": 13.5, "maxRate": 17.0, "maxTenureYears": 5, "notes": "T&C apply" },
+      "housingLoan": { "minRate": 11.5, "maxRate": 16.0, "maxTenureYears": 25, "notes": "T&C apply" },
+      "vehicleLoan": { "minRate": 13.5, "maxRate": 17.0, "maxTenureYears": 7, "notes": "T&C apply" },
+      "fixedDeposit12Month": { "rate": 10.0, "notes": "T&C apply" },
+      "savingsAccount": { "rate": 2.0, "notes": "T&C apply" }
     },
     {
       "name": "Sampath Bank",
       "shortName": "Sampath",
-      "personalLoan": { "minRate": 13.5, "maxRate": 20.0, "maxTenureYears": 7, "notes": "SAMPLE" },
-      "housingLoan": { "minRate": 12.5, "maxRate": 15.0, "maxTenureYears": 25, "notes": "SAMPLE" },
-      "vehicleLoan": { "minRate": 10.0, "maxRate": 15.0, "maxTenureYears": 5, "notes": "SAMPLE" },
-      "fixedDeposit12Month": { "rate": 10.0, "notes": "SAMPLE" },
-      "savingsAccount": { "rate": 2.0, "notes": "SAMPLE" }
+      "personalLoan": { "minRate": 13.5, "maxRate": 20.0, "maxTenureYears": 7, "notes": "T&C apply" },
+      "housingLoan": { "minRate": 12.5, "maxRate": 15.0, "maxTenureYears": 25, "notes": "T&C apply" },
+      "vehicleLoan": { "minRate": 10.0, "maxRate": 15.0, "maxTenureYears": 5, "notes": "T&C apply" },
+      "fixedDeposit12Month": { "rate": 10.0, "notes": "T&C apply" },
+      "savingsAccount": { "rate": 2.0, "notes": "T&C applyE" }
     },
     {
       "name": "Seylan Bank",
       "shortName": "Seylan",
-      "personalLoan": { "minRate": 12.5, "maxRate": 17.5, "maxTenureYears": 7, "notes": "SAMPLE" },
-      "housingLoan": { "minRate": 11.75, "maxRate": 16.75, "maxTenureYears": 25, "notes": "SAMPLE" },
-      "vehicleLoan": { "minRate": 12.25, "maxRate": 16.75, "maxTenureYears": 7, "notes": "SAMPLE" },
-      "fixedDeposit12Month": { "rate": 10.5, "notes": "SAMPLE" },
-      "savingsAccount": { "rate": 2.5, "notes": "SAMPLE" }
+      "personalLoan": { "minRate": 12.5, "maxRate": 17.5, "maxTenureYears": 7, "notes": "T&C apply" },
+      "housingLoan": { "minRate": 11.75, "maxRate": 16.75, "maxTenureYears": 25, "notes": "T&C apply" },
+      "vehicleLoan": { "minRate": 12.25, "maxRate": 16.75, "maxTenureYears": 7, "notes": "T&C apply" },
+      "fixedDeposit12Month": { "rate": 10.5, "notes": "T&C apply" },
+      "savingsAccount": { "rate": 2.5, "notes": "T&C apply" }
     },
     {
       "name": "National Development Bank",
       "shortName": "NDB",
-      "personalLoan": { "minRate": 14.5, "maxRate": 15.0, "maxTenureYears": 5, "notes": "SAMPLE" },
-      "housingLoan": { "minRate": 13.5, "maxRate": 14.5, "maxTenureYears": 25, "notes": "SAMPLE" },
-      "vehicleLoan": { "minRate": 13.0, "maxRate": 15.5, "maxTenureYears": 7, "notes": "SAMPLE" },
-      "fixedDeposit12Month": { "rate": 10.0, "notes": "SAMPLE" },
-      "savingsAccount": { "rate": 2.5, "notes": "SAMPLE" }
+      "personalLoan": { "minRate": 14.5, "maxRate": 15.0, "maxTenureYears": 5, "notes": "T&C apply" },
+      "housingLoan": { "minRate": 13.5, "maxRate": 14.5, "maxTenureYears": 25, "notes": "T&C apply" },
+      "vehicleLoan": { "minRate": 13.0, "maxRate": 15.5, "maxTenureYears": 7, "notes": "T&C apply" },
+      "fixedDeposit12Month": { "rate": 10.0, "notes": "T&C apply" },
+      "savingsAccount": { "rate": 2.5, "notes": "T&C apply" }
     },
     {
       "name": "DFCC Bank",
       "shortName": "DFCC",
-      "personalLoan": { "minRate": 14.0, "maxRate": 16.5, "maxTenureYears": 8, "notes": "SAMPLE" },
-      "housingLoan": { "minRate": 12.75, "maxRate": 16.0, "maxTenureYears": 30, "notes": "SAMPLE" },
-      "vehicleLoan": { "minRate": 13.75, "maxRate": 14.75, "maxTenureYears": 6, "notes": "SAMPLE" },
-      "fixedDeposit12Month": { "rate": 10.5, "notes": "SAMPLE" },
-      "savingsAccount": { "rate": 3.5, "notes": "SAMPLE" }
+      "personalLoan": { "minRate": 14.0, "maxRate": 16.5, "maxTenureYears": 8, "notes": "T&C apply" },
+      "housingLoan": { "minRate": 12.75, "maxRate": 16.0, "maxTenureYears": 30, "notes": "T&C apply" },
+      "vehicleLoan": { "minRate": 13.75, "maxRate": 14.75, "maxTenureYears": 6, "notes": "T&C apply" },
+      "fixedDeposit12Month": { "rate": 10.5, "notes": "T&C apply" },
+      "savingsAccount": { "rate": 3.5, "notes": "T&C apply" }
     },
     {
       "name": "Nations Trust Bank",
       "shortName": "NTB",
-      "personalLoan": { "minRate": 12.5, "maxRate": 12.85, "maxTenureYears": 7, "notes": "SAMPLE" },
-      "housingLoan": { "minRate": 12.6, "maxRate": 14.5, "maxTenureYears": 20, "notes": "SAMPLE" },
-      "vehicleLoan": { "minRate": 14.0, "maxRate": 18.0, "maxTenureYears": 5, "notes": "SAMPLE" },
-      "fixedDeposit12Month": { "rate": 10.0, "notes": "SAMPLE" },
-      "savingsAccount": { "rate": 2.0, "notes": "SAMPLE" }
+      "personalLoan": { "minRate": 12.5, "maxRate": 12.85, "maxTenureYears": 7, "notes": "T&C apply" },
+      "housingLoan": { "minRate": 12.6, "maxRate": 14.5, "maxTenureYears": 20, "notes": "T&C apply" },
+      "vehicleLoan": { "minRate": 14.0, "maxRate": 18.0, "maxTenureYears": 5, "notes": "T&C apply" },
+      "fixedDeposit12Month": { "rate": 10.0, "notes": "T&C apply" },
+      "savingsAccount": { "rate": 2.0, "notes": "T&C apply" }
     }
   ]
 }
