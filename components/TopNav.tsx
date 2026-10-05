@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useState, useEffect, type MouseEvent } from "react";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import ThemeToggle from "./ThemeToggle";
 import { usePlan } from "@/lib/usePlan";
 
 interface NavItem {
@@ -282,17 +281,16 @@ export default function TopNav({ view = "home" }: TopNavProps) {
                 );
               })}
 
-              <div className="mt-1 pt-3 border-t border-gray-200 dark:border-white/10 flex items-center justify-between px-3 pb-1">
-                {pathname === "/" ? <ThemeToggle inline /> : <span />}
-                {session?.user && (
+              {session?.user && (
+                <div className="mt-1 pt-3 border-t border-gray-200 dark:border-white/10 flex items-center justify-end px-3 pb-1">
                   <button
                     onClick={() => signOut({ callbackUrl: "/" })}
                     className="text-sm font-semibold text-gray-700 dark:text-white/80 px-3 py-2 touch-target"
                   >
                     Sign Out
                   </button>
-                )}
-              </div>
+                </div>
+              )}
             </motion.div>
           )}
         </AnimatePresence>

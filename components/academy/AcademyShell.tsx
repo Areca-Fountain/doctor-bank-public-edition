@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import ThemeToggle from "@/components/ThemeToggle";
 import SmoothScroll from "@/components/SmoothScroll";
 import { headingsOf, hrefFor, pageBySlug, pages, sidebarGroups, topTabs, type Block } from "@/lib/academy";
 
@@ -373,9 +372,6 @@ export default function AcademyShell({ children }: { children: ReactNode }) {
               <span className="hidden sm:inline">Search</span>
               <kbd className="hover-only ml-auto hidden rounded-md border border-gray-200 px-1.5 text-[11px] font-semibold text-gray-500 dark:border-white/20 lg:inline">Ctrl K</kbd>
             </button>
-            <div className="hidden sm:block">
-              <ThemeToggle inline />
-            </div>
             <Link
               href="/"
               className="hidden rounded-full px-3 py-2 text-sm font-semibold text-gray-700 dark:text-white/80 lg:block"
@@ -429,8 +425,7 @@ export default function AcademyShell({ children }: { children: ReactNode }) {
               <div className="flex-1 overflow-y-auto overscroll-contain pb-6">
                 <SidebarNav slug={slug} onNavigate={() => setDrawer(false)} pillId="academyDrawerPill" />
               </div>
-              <div className="flex items-center justify-between border-t border-gray-200 pt-3 dark:border-white/10">
-                <ThemeToggle inline />
+              <div className="flex items-center border-t border-gray-200 pt-3 dark:border-white/10">
                 <Link href="/" className="touch-target px-3 py-2 text-sm font-semibold text-gray-700 dark:text-white/80">
                   Back to home
                 </Link>

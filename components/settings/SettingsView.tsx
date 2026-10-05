@@ -3,6 +3,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
+import { useTheme } from "next-themes";
 import { AnimatePresence, motion, type Variants } from "framer-motion";
 import TopNav from "@/components/TopNav";
 import SmoothScroll from "@/components/SmoothScroll";
@@ -150,7 +151,7 @@ export default function SettingsView() {
             Settings
           </motion.h1>
           <motion.p variants={rise} className="mt-3 max-w-2xl text-base leading-7 text-gray-600 dark:text-gray-400 sm:text-lg">
-            Manage your account, your plan, the AI model and your security.
+            Manage your account, your plan, the AI model, the colour theme and your security.
           </motion.p>
         </motion.div>
 
@@ -356,6 +357,14 @@ export default function SettingsView() {
               </p>
             </motion.section>
 
+            {/* Appearance (colour theme) */}
+            <motion.section variants={rise} id="appearance" className={card} aria-labelledby="theme-h">
+              <div id="theme-h">
+                <SectionTitle title="Appearance">Choose the colour theme for the whole Doctor Bank website.</SectionTitle>
+              </div>
+              <ThemeChoice />
+            </motion.section>
+
             {/* Password */}
             <motion.section variants={rise} id="password" className={card} aria-labelledby="pw-h">
               <div id="pw-h">
@@ -422,6 +431,93 @@ export default function SettingsView() {
         {cancelOpen && <CancelSubscriptionDialog renews={renews} onClose={() => setCancelOpen(false)} />}
       </AnimatePresence>
     </div>
+  );
+}
+
+const THEME_OPTIONS = [
+  { id: "dark", name: "Dark", description: "Black background with white text. This is the default." },
+  { id: "light", name: "Light", description: "White background with black text." },
+] as const;
+
+function ThemeChoice() {
+  const { theme, setTheme } = useTheme();
+  // The saved theme is only known in the browser, so wait until mounted to avoid a server/browser mismatch
+  const [mounted, setMounted] = useState(false);
+  const [msg, setMsg] = useState("");
+  useEffect(() => setMounted(true), []);
+
+  const active = mounted ? (theme === "light" ? "light" : "dark") : null;
+
+  const choose = (id: (typeof THEME_OPTIONS)[number]["id"]) => {
+    if (id === active) return;
+    setTheme(id);
+    setMsg(`Saved. The ${id} theme is now on for the whole website.`);
+  };
+
+  return (
+    <>
+      <div role="radiogroup" aria-label="Colour theme" className="grid gap-3 sm:grid-cols-2">
+        {THEME_OPTIONS.map((opt) => {
+          const selected = active === opt.id;
+          return (
+            <button
+              key={opt.id}
+              type="button"
+              role="radio"
+              aria-checked={selected}
+              onClick={() => choose(opt.id)}
+              className={`touch-target flex flex-col gap-3 rounded-2xl border p-4 text-left transition-colors ${
+                selected
+                  ? "border-brand-primary bg-brand-primary/5 dark:border-white dark:bg-white/10"
+                  : "border-gray-200 dark:border-white/15 [@media(hover:hover)]:hover:border-brand-primary dark:[@media(hover:hover)]:hover:border-white/60"
+              }`}
+            >
+              {/* Little preview of the theme. Fixed colours on purpose so each card always shows its own theme. */}
+              <span
+                aria-hidden
+                className={`flex h-20 w-full flex-col justify-between rounded-xl border p-3 ${
+                  opt.id === "dark" ? "border-white/20 bg-black" : "border-gray-300 bg-white"
+                }`}
+              >
+                <span className={`h-2 w-1/3 rounded-full ${opt.id === "dark" ? "bg-white" : "bg-black"}`} />
+                <span className="flex items-center gap-2">
+                  <span className="h-3 w-10 rounded-full bg-brand-primary" />
+                  <span className={`h-2 w-1/2 rounded-full ${opt.id === "dark" ? "bg-white/30" : "bg-black/20"}`} />
+                </span>
+              </span>
+              <span className="flex items-start gap-3">
+                <span
+                  aria-hidden
+                  className={`mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 ${
+                    selected ? "border-brand-primary dark:border-white" : "border-gray-300 dark:border-white/40"
+                  }`}
+                >
+                  {selected && <span className="h-2.5 w-2.5 rounded-full bg-brand-primary dark:bg-white" />}
+                </span>
+                <span className="min-w-0">
+                  <span className="flex flex-wrap items-center gap-2">
+                    <span className="font-bold text-black dark:text-white">{opt.name}</span>
+                    {opt.id === "dark" && (
+                      <span className="rounded-full bg-brand-primary/10 px-2 py-0.5 text-[11px] font-bold text-brand-primary dark:bg-white/10 dark:text-white">
+                        Default
+                      </span>
+                    )}
+                  </span>
+                  <span className="mt-1 block text-sm leading-6 text-gray-600 dark:text-gray-400">{opt.description}</span>
+                </span>
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      <p role="status" aria-live="polite" className="mt-4 min-h-5 text-sm font-semibold text-green-700 dark:text-green-400">
+        {msg}
+      </p>
+      <p className="mt-1 text-xs leading-5 text-gray-500 dark:text-gray-400">
+        Your choice is remembered on this browser. If you never change it, the website stays dark.
+      </p>
+    </>
   );
 }
 
