@@ -1,0 +1,10 @@
+[build]
+  command = "npm run build"
+
+[build.environment]
+  NODE_OPTIONS = "--max-old-space-size=3072"
+  # Netlify's scanner flags any env value that shows up in the build output.
+  # These keys hold PUBLIC / non-secret config (shown in the UI, page HTML, or client JS),
+  # so they are expected to appear. Real secrets are deliberately NOT listed here,
+  # so DATABASE_URL, *_SECRET, *_API_KEY, SENTRY_*_TOKEN stay protected.
+  SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_GOOGLE_CLIENT_ID,GOOGLE_CLIENT_ID,NEXT_PUBLIC_PLAN_PRICE_LABEL,PAYHERE_PLAN_AMOUNT,PAYHERE_PLAN_CURRENCY,PAYHERE_MODE,MISTRAL_MODEL,NEXTAUTH_URL,SENTRY_ORG,SENTRY_PROJECT"

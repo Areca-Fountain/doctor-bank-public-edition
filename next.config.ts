@@ -3,43 +3,33 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   serverExternalPackages: ["require-in-the-middle", "import-in-the-middle"],
-  // ... any other config you already have here
 };
 
+// Source maps are what Sentry uploads at build time (368+ files with Turbopack).
+// Default = OFF so Netlify free-plan builds stay fast and light.
+// To turn on: set SENTRY_UPLOAD_SOURCEMAPS=true AND SENTRY_AUTH_TOKEN in Netlify env vars.
+const uploadSourceMaps =
+  process.env.SENTRY_UPLOAD_SOURCEMAPS === "true" && !!process.env.SENTRY_AUTH_TOKEN;
+
 export default withSentryConfig(nextConfig, {
-  // For all available options, see:
-  // https://www.npmjs.com/package/@sentry/webpack-plugin#options
-
   org: "areca-3n",
-
   project: "doctor-bank-web",
 
-  // Only print logs for uploading source maps in CI
   silent: !process.env.CI,
+  telemetry: false, // no build-time telemetry calls to Sentry
 
-  // For all available options, see:
-  // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
+  // Keep the upload small: browser bundles only, no "wide" upload.
+  widenClientFileUpload: false,
 
-  // Upload a larger set of source maps for prettier stack traces (increases build time)
-  widenClientFileUpload: true,
+  sourcemaps: {
+    disable: !uploadSourceMaps,
+    // Server/edge maps are the bulk of the ~368 files; browser maps are enough for most debugging.
+    ignore: ["**/server/**", "**/edge/**", "**/node_modules/**"],
+    // Don't ship .map files to the public site or keep them in the deploy bundle.
+    deleteSourcemapsAfterUpload: true,
+  },
 
-  // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
-  // This can increase your server load as well as your hosting bill.
-  // Note: Check that the configured route will not match with your Next.js middleware, otherwise reporting of client-
-  // side errors will fail.
+  // Route browser events through your own domain to dodge ad-blockers.
+  // (proxy.ts matcher only covers /chat, /dashboard, /admin, so /monitoring is not blocked.)
   tunnelRoute: "/monitoring",
-
-  webpack: {
-    // Enables automatic instrumentation of Vercel Cron Monitors. (Does not yet work with App Router route handlers.)
-    // See the following for more information:
-    // https://docs.sentry.io/product/crons/
-    // https://vercel.com/docs/cron-jobs
-    automaticVercelMonitors: true,
-
-    // Tree-shaking options for reducing bundle size
-    treeshake: {
-      // Automatically tree-shake Sentry logger statements to reduce bundle size
-      removeDebugLogging: true,
-    },
-  }
 });
