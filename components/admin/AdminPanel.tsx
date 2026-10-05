@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import SentryPanel from "@/components/admin/SentryPanel";
 
 type AdminUser = {
   id: string;
@@ -85,7 +86,7 @@ function PlanBadge({ user }: { user: { plan: string; planStatus: string } }) {
 }
 
 export default function AdminPanel({ currentAdminId }: { currentAdminId: string }) {
-  const [tab, setTab] = useState<"users" | "activity">("users");
+  const [tab, setTab] = useState<"users" | "activity" | "monitoring">("users");
   const [stats, setStats] = useState<Stats | null>(null);
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [total, setTotal] = useState(0);
@@ -205,10 +206,10 @@ export default function AdminPanel({ currentAdminId }: { currentAdminId: string 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-2">
         <div>
           <h1 className="text-3xl md:text-4xl font-black text-black">Admin Panel</h1>
-          <p className="text-gray-600 font-medium mt-1">Manage users, plans and activity.</p>
+          <p className="text-gray-600 font-medium mt-1">Manage users, plans, activity and app health.</p>
         </div>
         <div className="flex gap-2 rounded-full bg-[#F0F2F0] p-1 w-full sm:w-auto">
-          {(["users", "activity"] as const).map((t) => (
+          {(["users", "activity", "monitoring"] as const).map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
@@ -223,7 +224,7 @@ export default function AdminPanel({ currentAdminId }: { currentAdminId: string 
       </div>
 
       {/* Stats */}
-      {stats && (
+      {stats && tab !== "monitoring" && (
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 md:gap-4">
           <StatCard label="Total users" value={stats.totalUsers} />
           <StatCard label="New (7 days)" value={stats.newUsers7d} />
@@ -235,7 +236,9 @@ export default function AdminPanel({ currentAdminId }: { currentAdminId: string 
         </div>
       )}
 
-      {tab === "users" ? (
+      {tab === "monitoring" ? (
+        <SentryPanel />
+      ) : tab === "users" ? (
         <div className="bg-[#F0F2F0] rounded-3xl md:rounded-[40px] p-4 md:p-8 shadow-inner">
           {/* Search + filter */}
           <div className="flex flex-col md:flex-row gap-3 mb-5">
